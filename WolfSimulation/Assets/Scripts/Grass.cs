@@ -10,8 +10,11 @@ public class Grass : MonoBehaviour
 
     private Vector3 initialScale = Vector3.zero;
     private bool isGrown = false;
+    public bool IsGrown { get => isGrown; }
     private bool isEaten = false;
     private float growTimer = 0f;
+
+    public GameObject reservedBy {  get; set; }
 
     void Start()
     {
@@ -35,7 +38,7 @@ public class Grass : MonoBehaviour
         }
     }
 
-    void OnMouseDown()
+    public void OnMouseDown()
     {
         Debug.Log("Å¬¸¯µÊ");
 
