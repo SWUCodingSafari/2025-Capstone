@@ -45922,6 +45922,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RainParticle
       objectReference: {fileID: 0}
+    - target: {fileID: 9009111242974773319, guid: a2adf7a4d86e0214f8aa8410ff96adfd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -49510,7 +49514,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2030717698
 MonoBehaviour:
   m_ObjectHideFlags: 0

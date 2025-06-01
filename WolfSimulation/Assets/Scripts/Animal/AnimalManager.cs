@@ -21,10 +21,26 @@ public class AnimalManager<T> : Singleton<AnimalManager<T>> where T : Animal
     {
 
         // 이미 무리 성사가 완료됨
-        if (_this.PackNumber > -1 && _other.PackNumber > -1 &&
+        if (_this.PackNumber != -1 && _other.PackNumber != -1 &&
             _this.PackNumber == _other.PackNumber)
         {
             return;
+        }
+
+        // 둘다 무리가 있음
+        if(_this.PackNumber != -1 && _other.PackNumber != -1 &&
+            _this.PackNumber != _other.PackNumber)
+        {
+            var thisPack = packs[_this.PackNumber];
+            var otherPack = packs[_other.PackNumber];
+            foreach (var animal in otherPack)
+            {
+                thisPack.Add(animal);
+                animal.Mat.color = _this.Mat.color;
+            }
+
+            otherPack.Clear();
+
         }
 
         // 나는 무리가 없으며 이미 만난 동물이 무리가 있음
@@ -97,18 +113,22 @@ public class AnimalManager<T> : Singleton<AnimalManager<T>> where T : Animal
 
     public T WantMate(T _this)
     {
-        // 1. 무리가 없음
-        if (_this.PackNumber < 0)
+        if (_this.PackNumber < 0 && packs[_this.PackNumber].Count <= 1)
             return null;
 
-        // 2. 무리가 있음
         List<T> pack = packs[_this.PackNumber];
-        foreach(var animal in pack)
+        pack.Sort((a, b) => 
+        (int) ((b.transform.position - _this.transform.position).sqrMagnitude
+        - (a.transform.position - _this.transform.position).sqrMagnitude));
+        
+        for(int i = 1, count = pack.Count; i < count; ++i)
         {
-            if(animal.WantToMate == true)
-            {
-                return animal;
-            }
+            T p = pack[i];
+
+            if (p.IsDied &&
+                p.LookingForMate == true &&
+                p.CheckIfThisCanMate() == true)
+                return p;
         }
 
         return null;

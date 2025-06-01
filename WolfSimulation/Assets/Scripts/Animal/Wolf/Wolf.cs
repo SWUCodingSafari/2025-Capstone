@@ -1,17 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.VisualScripting;
+using UnityEngine;
 
-public class Deer : Animal
-{
-    /*
+public class Wolf : Animal
+{/*
      * [행동 리스트]
      * - 섭취 >> 배고픔
      * >> 배가 고플 때
      * >> 도망가야하는 상황이 아닐 때
+     * 
+     * - 정지 >> 배고픔, 시야거리
+     * >> 그냥 딱히 막 배고프지도, 도망가야하지도 않을 경우 그냥 멈춰서 쉼
      * 
      * - 정찰 >> 배고픔, 이동 속도, 시야거리
      * >> 배고픈데 주변에 풀이 없는 경우
@@ -22,10 +22,12 @@ public class Deer : Animal
      * >> 섭취 상태가 아닐 때
      * >> Boid
      * 
-     * - 도망 >> 체력, 이동 속도, 시야거리, (+ 공격력)
+     * - 추격 >> 체력, 이동 속도, 시야거리, (+ 공격력)
      * >> 주변에 늑대가 보일때
      * >> 주변 무리가 도망 상태일때
      * >> Boid
+     * 
+     * - 공격 >> 이동 속도, 시야거리, 
      * 
      * - 번식 >> 체력, 배고픔
      * >> 체력과 배고픔이 충분 할때
@@ -37,6 +39,7 @@ public class Deer : Animal
      * >> *체력이 0이어도 배고픔이 남아있다면 휴식 상태로 전환한다.
      * 
      * - 휴식 >> 체력, 배고픔
+     * >> 딱히 뭔가 할 필요 없을 때(배고픔이 특정 퍼센트 이하 + 무리 있음 + 풀 있음)
      * >> 체력이 최대 체력 이하고, 배고픔이 특정 퍼센트 이상일 때
      * >> 배고픔을 일정량 줄이고, 체력을 일정량 회복
      */
@@ -44,11 +47,13 @@ public class Deer : Animal
     public enum DeerState
     {
         Eat,
+        Idle,
         Search,
         Move,
-        Run,
+        Chase,
+        Attack,
         Mate,
-        Rest,
+        Healing,
         Die,
         MAX,
     }
@@ -60,7 +65,9 @@ public class Deer : Animal
     [SerializeField] private DeerState state;
     public DeerState State { get => state; private set => state = value; }
 
-    private float[] stateFactors = new float[(int)DeerState.MAX];
+    [SerializeField] private float[] stateFactors = new float[(int)DeerState.MAX];
+
+    [SerializeField] private Animator animator;
 
     protected override void Init()
     {
@@ -71,52 +78,56 @@ public class Deer : Animal
 
     private DeerState ChangeState()
     {
-        if(health <= 0 && hunger <= 0)
+        if (BaseStatus.health <= 0 && BaseStatus.hunger <= 0)
         {
             return DeerState.Die;
         }
 
-        float runPoint = wolfList.Count + deerList.Count(_ => _.State == DeerState.Run);
-        if (runPoint > 0)
-            return DeerState.Run;
+        //float runPoint = wolfList.Count + deerList.Count(_ => _.State == DeerState.Run);
+        //if (runPoint > 0)
+        //    return DeerState.Run;
 
         // 팩터 초기화
-        for(int i = 0; i < (int)DeerState.MAX; ++i)
+        for (int i = 0; i < (int)DeerState.MAX; ++i)
         {
             stateFactors[i] = -1f;
         }
 
+        // 휴식
+        stateFactors[(int)DeerState.Idle] =
+            CheckState(DeerState.Eat) ? 0f : BaseStatus.maxStamina - BaseStatus.stamina;
+
         // 섭취 팩터: 풀이 없으면 정찰로 넘어가도록 유도
-        stateFactors[(int)DeerState.Eat] = (grassList.Any(g => g.reservedBy == null) ? 1f : 0f)
-            * hungerCurve.Evaluate(hunger / maxHunger);
+        stateFactors[(int)DeerState.Eat] = (GrassList.Any(g => g.IsGrown == true && g.reservedBy == null) ? 1f : 0f)
+            * BaseStatus.hungerCurve.Evaluate(BaseStatus.hunger / BaseStatus.maxHunger);
 
         // 정찰 팩터
-        bool noGrass = grassList.All(g => g.reservedBy != null);
-        bool noDeerNearby = deerList.Count == 0;
+        bool noGrass = GrassList.All(g => g.reservedBy != null);
+        bool noDeerNearby = DeerList.Count == 0;
 
-        float hungerFactor = Mathf.Clamp01(hunger / maxHunger); // 배고프면 1에 가까움
+        float hungerFactor = Mathf.Clamp01(BaseStatus.hunger / BaseStatus.maxHunger); // 배고프면 1에 가까움
 
-        stateFactors[(int)DeerState.Search] = (noGrass || noDeerNearby ? 1f : 0f) * hungerFactor * searchAdder;
+        stateFactors[(int)DeerState.Search] = (noGrass || noDeerNearby ? 1f : 0f) * hungerFactor * BaseStatus.searchAdder;
 
         // 이동 팩터
-        float distance = deerList.Count > 0 ? (deerList[0].transform.position - transform.position).magnitude : -1f;
+        float distance = DeerList.Count > 0 ? (DeerList[0].transform.position - transform.position).magnitude : -1f;
         stateFactors[(int)DeerState.Move] = (CheckState(DeerState.Eat) || distance < 0f ? 0f :
-            Mathf.Abs(distance - maxClusterDistance) * moveAdder);
+            Mathf.Abs(distance - BaseStatus.maxClusterDistance) * moveAdder);
 
         // 번식 팩터
-        bool isHealthy = health >= maxHealth * 0.9f;
-        bool isFull = hunger / maxHunger >= 0.8f;
-        bool hasGroup = deerList.Count > 0;
-        bool safe = !CheckState(DeerState.Run);
-        bool hasGrass = grassList.Count(g => g.reservedBy == null) >= 3;
+        //bool isHealthy = BaseStatus.health >= BaseStatus.maxHealth * 0.9f;
+        //bool isFull = BaseStatus.hunger / BaseStatus.maxHunger >= 0.8f;
+        //bool hasGroup = deerList.Count > 0;
+        //bool safe = !CheckState(DeerState.Run);
+        //bool hasGrass = grassList.Count(g => g.reservedBy == null) >= 3;
 
-        stateFactors[(int)DeerState.Mate] = 
-            (isHealthy && isFull && hasGroup && safe && hasGrass ? 1f : 0f) * mateAdder;
+        //stateFactors[(int)DeerState.Mate] =
+        //    (isHealthy && isFull && hasGroup && safe && hasGrass ? 1f : 0f) * BaseStatus.mateAdder;
 
         // 회복 팩터
-        bool enoughHunger = hunger / maxHunger >= 0.5f; // 배고픔이 50% 이상
-        stateFactors[(int)DeerState.Rest] = (enoughHunger ? 1f : 0f) * 
-            Mathf.Clamp01((maxHealth - health) / maxHealth) * hungerToRestAdder;
+        bool enoughHunger = BaseStatus.hunger / BaseStatus.maxHunger >= 0.5f; // 배고픔이 50% 이상
+        stateFactors[(int)DeerState.Healing] = (enoughHunger ? 1f : 0f) *
+            Mathf.Clamp01((BaseStatus.maxHealth - BaseStatus.health) / BaseStatus.maxHealth) * BaseStatus.hungerToRestAdder;
 
         return (DeerState)GetTopFactor();
     }
@@ -142,11 +153,11 @@ public class Deer : Animal
     {
         // 풀 정리(내가 먹을 수 있는 것만 남김)
         int i = 0;
-        while(i < grassList.Count)
+        while (i < GrassList.Count)
         {
-            if(grassList[i].reservedBy != null && grassList[i].reservedBy != gameObject)
+            if (GrassList[i] == null || (GrassList[i].reservedBy != null && GrassList[i].reservedBy != gameObject))
             {
-                grassList.Remove(grassList[i]);
+                GrassList.Remove(GrassList[i]);
             }
             else
             {
@@ -154,7 +165,7 @@ public class Deer : Animal
             }
         }
         // 풀 정렬 (가까운 순)
-        grassList.Sort((a, b) =>
+        GrassList.Sort((a, b) =>
         {
             if (a.IsGrown == true && b.IsGrown == false)
                 return 1;
@@ -171,7 +182,7 @@ public class Deer : Animal
         });
 
         // 사슴 정렬 (가까운 순)
-        deerList.Sort((a, b) =>
+        DeerList.Sort((a, b) =>
         {
             if ((a.transform.position - transform.position).sqrMagnitude <
             (b.transform.position - transform.position).sqrMagnitude)
@@ -183,7 +194,7 @@ public class Deer : Animal
         });
 
         // 늑대 정렬 (가까운 순)
-        wolfList.Sort((a, b) =>
+        WolfList.Sort((a, b) =>
         {
             if ((a.transform.position - transform.position).sqrMagnitude <
             (b.transform.position - transform.position).sqrMagnitude)
@@ -201,7 +212,24 @@ public class Deer : Animal
         base.Update();
     }
 
-    protected override void OnEnviromentChanged()
+    protected override void BehaviourCycle()
+    {
+        base.BehaviourCycle();
+
+        // 스태미나
+        if (CheckState(DeerState.Idle) == true)
+            return;
+
+        float subSBySec = BaseStatus.subStaminaByWalkSec;
+        if (CheckState(DeerState.Chase) == true)
+        {
+            subSBySec = BaseStatus.subStaminaByRunSec;
+        }
+
+        BaseStatus.stamina = Mathf.Clamp(BaseStatus.stamina - subSBySec * Time.deltaTime, 0f, BaseStatus.maxStamina);
+    }
+
+    public override void OnEnviromentChanged()
     {
         // 환경 조건 정리
         SortLists();
@@ -209,26 +237,33 @@ public class Deer : Animal
         SelectStateAndBehave();
     }
 
-    protected override void SelectStateAndBehave()
+    protected override void SelectStateAndBehave(int _newState = -1)
     {
         var newState = ChangeState();
 
         // 이미 그 행동을 진행 중
-        if (CheckState(newState))
+        if (CheckState(newState) == true)
+        {
+            stateReset?.Invoke();
             return;
+        }
 
+        Debug.Log($"Current State: {state}, Change State: {newState}");
         state = newState;
         stateChanged?.Invoke();
+        stateReset = null;
 
-        switch(newState)
+        switch (newState)
         {
-            case DeerState.Eat:     OnEat();    break;
-            case DeerState.Search:  OnSearch(); break;
-            case DeerState.Move:    OnMove();   break;
-            case DeerState.Run:     OnRun();    break;
+            case DeerState.Eat: OnEat(); break;
+            case DeerState.Idle: OnIdle(); break;
+            case DeerState.Search: OnSearch(); break;
+            case DeerState.Move: OnMove(); break;
+            case DeerState.Chase: OnRun(); break;
+            case DeerState.Attack: break;
             case DeerState.Mate: break;
-            case DeerState.Rest: break;
-            case DeerState.Die:     Die();      break;
+            case DeerState.Healing: break;
+            case DeerState.Die: Die(); break;
         }
 
     }
@@ -241,35 +276,59 @@ public class Deer : Animal
     #region Eat
     [SerializeField] private GameObject TG;
     private Grass targetGrass = null;
+    public Grass TGrass
+    {
+        get => targetGrass;
+        set
+        {
+            targetGrass = value;
+            if (value == null)
+            {
+                print("널뜸");
+            }
+        }
+    }
     private void OnEat()
     {
-        targetGrass = grassList.Find(_ => _.IsGrown && _.reservedBy == null);
-        if(targetGrass == null)
+        OnEatReset();
+
+        currentBehaviour = EatUpdate;
+        stateReset = OnEatReset;
+        stateChanged = OnEatExit;
+    }
+
+    private void OnEatReset()
+    {
+        if (TGrass != null)
+            return;
+
+        TGrass = GrassList.Find(_ => _.IsGrown && _.reservedBy == null);
+        if (TGrass == null)
         {
             OnEnviromentChanged();
             return;
         }
 
-        targetGrass.reservedBy = gameObject;
+        TGrass.reservedBy = gameObject;
         TG = targetGrass.gameObject;
-
-        currentBehaviour = EatUpdate;
-        stateChanged = OnEatExit;
     }
 
     private bool EatUpdate()
     {
-        Vector3 subVec = targetGrass.transform.position - transform.position;
-        transform.forward = subVec.normalized;
-        rigid.MovePosition(transform.position + transform.forward * moveSpeed * Time.deltaTime);
+        if (TGrass == null)
+            return true;
+
+        Vector3 subVec = TGrass.transform.position - transform.position;
+        subVec.y = 0f;
+        TurnToDesiredDir(subVec.normalized);
+        rigid.MovePosition(transform.position + transform.forward * BaseStatus.moveSpeed * Time.deltaTime);
 
         if (subVec.sqrMagnitude <= 0.5f)
         {
             // todo: 임시 코드
-            grassList.Remove(targetGrass);
-            targetGrass.OnMouseDown();
-            hunger = Mathf.Clamp(hunger - subHungerWhenEat, 0, maxHunger);
-            state = DeerState.MAX;
+            GrassList.Remove(TGrass);
+            TGrass.OnMouseDown();
+            BaseStatus.hunger = Mathf.Clamp(BaseStatus.hunger - BaseStatus.subHungerWhenEat, 0, BaseStatus.maxHunger);
             return true;
         }
         return false;
@@ -277,12 +336,38 @@ public class Deer : Animal
 
     private void OnEatExit()
     {
-        if (targetGrass == null)
+        Debug.Log("Eat Exit");
+        if (TGrass == null)
             return;
 
-        targetGrass.reservedBy = null;
-        targetGrass = null;
+        TGrass.reservedBy = null;
+        TGrass = null;
     }
+    #endregion
+
+    #region Idle
+    private void OnIdle()
+    {
+        currentBehaviour = IdleUpdate;
+        stateChanged = IdleExit;
+
+        animator.speed = 0f;
+    }
+
+    private bool IdleUpdate()
+    {
+        BaseStatus.stamina = Mathf.Clamp(BaseStatus.stamina + BaseStatus.addStaminaBySec * Time.deltaTime,
+            0, BaseStatus.maxStamina);
+        return false;
+    }
+
+    private void IdleExit()
+    {
+        animator.speed = 1f;
+
+        return;
+    }
+
     #endregion
 
     #region Search
@@ -300,10 +385,16 @@ public class Deer : Animal
     private void OnSearch()
     {
         currentBehaviour = SearchUpdate;
+        stateReset = SearchReset;
         stateChanged = OnSearchExit;
 
-        int grassCount = grassList.Count;
-        int deerCount = deerList.Count;
+        SearchReset();
+    }
+
+    private void SearchReset()
+    {
+        int grassCount = GrassList.Count;
+        int deerCount = DeerList.Count;
 
         if (grassCount > 0 && deerCount == 0) // 풀은 있는데 무리가 없음
         {
@@ -326,7 +417,7 @@ public class Deer : Animal
     private float searchElapsedTime = 0f;
     private bool SearchUpdate()
     {
-        if(searchType == SearchType.SearchBoth)
+        if (searchType == SearchType.SearchBoth)
         {
             searchElapsedTime += Time.deltaTime;
             if (searchElapsedTime >= searchTime)
@@ -339,8 +430,8 @@ public class Deer : Animal
 
         // 종료 조건 없음, 만약 풀이나 사슴을 찾았다면,
         // 그 쪽에서 환경 변화가 발생했다고 트리거감
-        transform.forward = searchDir.normalized;
-        rigid.MovePosition(rigid.position + transform.forward * moveSpeed * Time.deltaTime);
+        TurnToDesiredDir(searchDir);
+        rigid.MovePosition(rigid.position + transform.forward * BaseStatus.moveSpeed * Time.deltaTime);
 
         return false;
     }
@@ -349,25 +440,30 @@ public class Deer : Animal
     {
         searchElapsedTime = 0f;
         searchDir = Vector3.zero;
+
+        stateReset = null;
+
     }
 
     private void MoveToGrass()
     {
         // 무리가 없긴하지만, 일단 있는 자원인 풀 쪽으로 향하는 것이 생존상 유리
-        
+
         SortLists();
 
-        Grass targetG = grassList[grassList.Count / 2]; // 적당한 거리의 풀을 선택
+        Grass targetG = GrassList[GrassList.Count / 2]; // 적당한 거리의 풀을 선택
         searchDir = (targetG.transform.position - transform.position).normalized;
+        searchDir.y = 0f;
+        searchDir = searchDir.normalized;
     }
 
     private void FollowPack()
     {
         // 무리가 향하는 방향 => 풀이 있을 가능성 높음
         Vector3 center = Vector3.zero;
-        foreach (var deer in deerList)
+        foreach (var deer in DeerList)
             center += deer.transform.position;
-        center /= deerList.Count;
+        center /= DeerList.Count;
 
         searchDir = (center - transform.position).normalized;
     }
@@ -397,8 +493,9 @@ public class Deer : Animal
         byte newDir = 0b00;
 
         // 새로운 방향이 기존 방향과 동일하지 않고, 완전 반대 방향이 아닌 경우
-        do {
-            newDir = (byte) ((Random.Range(0, 4) << 2) + Random.Range(0, 4));
+        do
+        {
+            newDir = (byte)((Random.Range(0, 4) << 2) + Random.Range(0, 4));
         } while (((newDir == currentSearchWay) && (~newDir == currentSearchWay)));
 
         currentSearchWay = newDir;
@@ -433,18 +530,19 @@ public class Deer : Animal
         stateChanged = OnMoveExit;
     }
 
-    private Vector3 moveDir = Vector3.zero;
+    private Vector3 moveTargetDir = Vector3.zero;
     private bool MoveUpdate()
     {
         SetMoveDir();
-        transform.forward = moveDir;
-        rigid.MovePosition(transform.position + transform.forward * moveSpeed * Time.deltaTime);
+
+        TurnToDesiredDir(moveTargetDir);
+        rigid.MovePosition(transform.position + transform.forward * BaseStatus.moveSpeed * Time.deltaTime);
         return false; // 어차피 해당 업데이트 이후 Behaviour Cycle에 따라 처리가 됨
     }
 
     private void OnMoveExit()
     {
-        moveDir = Vector3.zero;
+        moveTargetDir = Vector3.zero;
     }
 
     private void SetMoveDir()
@@ -455,13 +553,13 @@ public class Deer : Animal
         Vector3 cohesion = Vector3.zero;
         int count = 0;
 
-        foreach (var neighbor in deerList)
+        foreach (var neighbor in DeerList)
         {
             Vector3 toNeighbor = neighbor.transform.position - transform.position;
             float distance = toNeighbor.magnitude;
 
             // Separation
-            if (distance < minClusterDistance)
+            if (distance < BaseStatus.minClusterDistance)
             {
                 separation -= toNeighbor.normalized / distance; // 가까울수록 더 강하게 밀어냄
             }
@@ -481,7 +579,7 @@ public class Deer : Animal
 
         if (count == 0)
         {
-            moveDir = transform.forward;
+            moveTargetDir = transform.forward;
         }
 
         alignment /= count;
@@ -492,13 +590,13 @@ public class Deer : Animal
         float weightAlignment = 1.0f;
         float weightCohesion = 1.0f;
 
-        moveDir = (
+        moveTargetDir = (
             separation.normalized * weightSeparation +
             alignment.normalized * weightAlignment +
             cohesion.normalized * weightCohesion
         );
-        moveDir.y = 0f;
-        moveDir = moveDir.normalized;
+        moveTargetDir.y = 0f;
+        moveTargetDir = moveTargetDir.normalized;
 
         return;
     }
@@ -516,7 +614,7 @@ public class Deer : Animal
 
     private bool RunUpdate()
     {
-        rigid.MovePosition(transform.position + transform.forward * runSpeed * Time.deltaTime);
+        rigid.MovePosition(transform.position + transform.forward * BaseStatus.runSpeed * Time.deltaTime);
         return false; // 환경이 변경되면 알아서 처리됨
     }
 
@@ -544,31 +642,31 @@ public class Deer : Animal
         // todo: 생략
         return false;
 
-        if(mateDeer == null)
-        {
-            // 주변에 번식이 가능한 사슴을 찾음
-            mateDeer = AnimalManager<Deer>.Instance.WantMate(this);
-            return false;
-        }
-        mateElapsedTime += Time.deltaTime;
-        if(mateElapsedTime > mateTime)
-        {
-            return true;
-        }
+        //if (mateDeer == null)
+        //{
+        //    // 주변에 번식이 가능한 사슴을 찾음
+        //    mateDeer = AnimalManager<Deer>.Instance.WantMate(this);
+        //    return false;
+        //}
+        //mateElapsedTime += Time.deltaTime;
+        //if (mateElapsedTime > mateTime)
+        //{
+        //    return true;
+        //}
 
         return false;
     }
 
     private void OnMateExit()
     {
-        wantToMate = false;
+        lookingForMate = false;
     }
     #endregion
 
     #region Die
     private void Die()
     {
-        isDied = true;
+        IsDied = true;
 
         // todo: 디버그 용
         Destroy(gameObject, 1f);
@@ -577,7 +675,7 @@ public class Deer : Animal
 
     public override void GetDamaged(float _value)
     {
-        health = Mathf.Clamp(health - _value, 0, maxHealth);
+        BaseStatus.health = Mathf.Clamp(BaseStatus.health - _value, 0, BaseStatus.maxHealth);
         OnEnviromentChanged();
     }
 
@@ -585,18 +683,18 @@ public class Deer : Animal
     {
         base.OnTriggerEnter(other);
 
-        Deer otherDeer = null;
-        if(IsThereComponent<Deer>(other, out otherDeer) == false)
-        {
-            return;
-        }
+        //Deer otherDeer = null;
+        //if (IsThereComponent<Deer>(other, out otherDeer) == false)
+        //{
+        //    return;
+        //}
 
-        AnimalManager<Deer>.Instance.MeetPack(this, otherDeer);
-        if (coLoosePack != null)
-        {
-            StopCoroutine(coLoosePack);
-            coLoosePack = null;
-        }
+        //AnimalManager<Deer>.Instance.MeetPack(this, otherDeer);
+        //if (BaseStatus.coLoosePack != null)
+        //{
+        //    StopCoroutine(BaseStatus.coLoosePack);
+        //    BaseStatus.coLoosePack = null;
+        //}
     }
 
     protected override void OnTriggerExit(Collider other)
@@ -609,10 +707,10 @@ public class Deer : Animal
             return;
         }
 
-        if(deerList.Count <= 0)
+        if (DeerList.Count <= 0)
         {
             // 주변에 무리가 보이지 않음
-            coLoosePack = StartCoroutine(CoLoosePack<Deer>());
+            BaseStatus.coLoosePack = StartCoroutine(CoLoosePack<Deer>());
         }
     }
 
@@ -621,4 +719,16 @@ public class Deer : Animal
     {
     }
 
+
+    private void TurnToDesiredDir(Vector3 _targetDir)
+    {
+        transform.rotation = Quaternion.RotateTowards(transform.rotation,
+            Quaternion.LookRotation(_targetDir),
+            BaseStatus.maxTurnAngleBySec * Time.deltaTime);
+    }
+
+    protected override void GiveBirth(Animal _other)
+    {
+        throw new System.NotImplementedException();
+    }
 }
