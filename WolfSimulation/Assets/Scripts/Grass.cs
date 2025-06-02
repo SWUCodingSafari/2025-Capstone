@@ -40,6 +40,11 @@ public class Grass : MonoBehaviour
 
     public void OnMouseDown()
     {
+        Eaten();
+    }
+
+    public void Eaten()
+    {
         Debug.Log("Å¬¸¯µÊ");
 
         if (isGrown && !isEaten)

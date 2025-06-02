@@ -170,8 +170,8 @@ MonoBehaviour:
   mateTime: 2
   addUrgeToMateBySec: 0.3
   viewDist: 5
-  moveSpeed: 2
-  runSpeed: 3
+  moveSpeed: 4
+  runSpeed: 5
   maxTurnAngleBySec: 15
   maxClusterDistance: 3
   minClusterDistance: 1.5
