@@ -4,37 +4,35 @@ using UnityEngine;
 
 public class Grass : MonoBehaviour
 {
-    public float growDuration = 3f;             // Ç® ¼ºÀå ½Ã°£ (ÃÊ)
-    public float regrowDelay = 2f;              // ¸ÔÈù ÈÄ Àç»ý¼º±îÁö ´ë±â ½Ã°£ (ÃÊ)
-    public Vector3 maxScale = new Vector3(5f, 5f, 5f); // ´Ù ÀÚ¶õ »óÅÂÀÇ Å©±â
+    public float growDuration = 3f;             // Ç® ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ (ï¿½ï¿½)
+    public float regrowDelay = 2f;              // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ (ï¿½ï¿½)
+    public Vector3 maxScale = new Vector3(5f, 5f, 5f); // ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Å©ï¿½ï¿½
 
-    private Vector3 initialScale = Vector3.zero;
-    private bool isGrown = false;
-    public bool IsGrown { get => isGrown; }
-    private bool isEaten = false;
-    private float growTimer = 0f;
+    private Vector3 initialScale = Vector3.zero;   // ï¿½Ê±ï¿½ Å©ï¿½ï¿½
+    private bool isGrown = false;                  // ï¿½ï¿½ ï¿½Ú¶ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public bool IsGrown { get => isGrown; }        // ï¿½Üºï¿½ ï¿½ï¿½ï¿½Ù¿ï¿½ getter
+    private bool isEaten = false;                  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    private float growTimer = 0f;                  // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    public GameObject reservedBy {  get; set; }
+    public GameObject reservedBy { get; set; }     // (ï¿½ï¿½ï¿½ï¿½) AIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½
 
     void Start()
     {
-        transform.localScale = initialScale;
-        StartCoroutine(Grow());
+        transform.localScale = initialScale;       // Ã³ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        StartCoroutine(Grow());                    // ï¿½ï¿½ï¿½ï¿½ ï¿½Ú·ï¿½Æ¾ ï¿½ï¿½ï¿½ï¿½
     }
 
     void Update()
     {
-        // ÀÚ¶ó´Â ÁßÀÏ ¶§¸¸ Å©±â Áõ°¡
+        // ï¿½Ú¶ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
         if (!isGrown && !isEaten)
         {
             growTimer += Time.deltaTime;
-            float progress = Mathf.Clamp01(growTimer / growDuration);
+            float progress = Mathf.Clamp01(growTimer / growDuration); // 0~1 ï¿½ï¿½ï¿½ï¿½
             transform.localScale = Vector3.Lerp(initialScale, maxScale, progress);
 
             if (progress >= 1f)
-            {
                 isGrown = true;
-            }
         }
     }
 
@@ -45,7 +43,7 @@ public class Grass : MonoBehaviour
 
     public void Eaten()
     {
-        Debug.Log("Å¬¸¯µÊ");
+        Debug.Log("Å¬ï¿½ï¿½ï¿½ï¿½");
 
         if (isGrown && !isEaten)
         {
@@ -55,15 +53,17 @@ public class Grass : MonoBehaviour
 
     IEnumerator Grow()
     {
+        // ï¿½Ú¶ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½Ê±ï¿½È­)
         isGrown = false;
         isEaten = false;
         growTimer = 0f;
         transform.localScale = initialScale;
-        yield return null; // ÇÁ·¹ÀÓ ÇÑ ¹ø ½¬°í ÀÚ¶ó±â ½ÃÀÛ
+        yield return null; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½
     }
 
     IEnumerator EatGrass()
     {
+        // Ç®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ ï¿½ç¼ºï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         isEaten = true;
         transform.localScale = Vector3.zero;
         yield return new WaitForSeconds(regrowDelay);
