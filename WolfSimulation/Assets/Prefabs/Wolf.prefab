@@ -161,8 +161,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   addHungerBySec: 0.5
-  stamina: 10
-  maxStamina: 10
+  stamina: 20
+  maxStamina: 20
   subStaminaByWalkSec: 0.3
   subStaminaByRunSec: 1
   subStaminaByMateSec: 0.8
@@ -177,7 +177,7 @@ MonoBehaviour:
   addUrgeToMateBySec: 0.3
   viewDist: 5
   moveSpeed: 4
-  runSpeed: 7
+  runSpeed: 20
   maxTurnAngleBySec: 60
   maxClusterDistance: 3
   minClusterDistance: 1.5

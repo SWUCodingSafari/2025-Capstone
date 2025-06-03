@@ -215,8 +215,10 @@ public class Deer : Animal
             {
                 return 1;
             }
-            else
+            else if((a.transform.position - transform.position).sqrMagnitude >
+            (b.transform.position - transform.position).sqrMagnitude)
                 return -1;
+            return 0;
         });
 
         // 늑대 정렬 (가까운 순)
@@ -250,6 +252,11 @@ public class Deer : Animal
 
         if(CheckState(DeerState.MAX) == false)
             stateBehaviours[(int)state].OnBehaviourCycle();
+
+        if(BaseStatus.health <= 0f)
+        {
+            SelectStateAndBehave((int)DeerState.Die);
+        }
     }
 
     public override void OnEnviromentChanged()

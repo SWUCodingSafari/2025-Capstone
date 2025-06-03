@@ -94,6 +94,9 @@ public class Wolf : Animal
             return WolfState.Die;
         }
 
+        if (CheckState(WolfState.Chase) == true)
+            return WolfState.Chase;
+
         // ∆—≈Õ √ ±‚»≠
         for (int i = 0; i < (int)WolfState.MAX; ++i)
         {
@@ -232,7 +235,8 @@ public class Wolf : Animal
             stateBehaviours[(int)state].ReducedStamina();
         BaseStatus.stamina = Mathf.Clamp(BaseStatus.stamina - subBySec * Time.deltaTime, 0f, BaseStatus.maxStamina);
 
-        stateBehaviours[(int)state].OnBehaviourCycle();
+        if(CheckState(WolfState.MAX) == false )
+            stateBehaviours[(int)state].OnBehaviourCycle();
     }
 
     public override void OnEnviromentChanged()

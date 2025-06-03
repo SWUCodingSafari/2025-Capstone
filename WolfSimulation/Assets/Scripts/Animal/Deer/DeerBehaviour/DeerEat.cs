@@ -27,8 +27,6 @@ public class DeerEat : AnimalStateBehaviour
     public override void OnEnter()
     {
         OnReset();
-
-        animal.anim.SetBool(DeerAnimation.IsWalking, true);
     }
 
     public override void OnReset()
@@ -47,6 +45,8 @@ public class DeerEat : AnimalStateBehaviour
         elapsedTime = 0f;
         eatTime = -1f;
         isSearching = true;
+
+        animal.anim.SetBool(DeerAnimation.IsWalking, true);
     }
 
     public override void OnExit()

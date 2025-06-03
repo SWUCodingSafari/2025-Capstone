@@ -27,6 +27,8 @@ public class WolfChase : AnimalStateBehaviour
         if (targetDeer == null)
             return true;
 
+        Debug.Log($"Target id: {targetDeer.id}, ({animal.id})");
+
         Vector3 subVec = targetDeer.transform.position - animal.transform.position;
         subVec.y = 0;
 

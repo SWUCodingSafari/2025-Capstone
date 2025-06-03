@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class GrassManager : MonoBehaviour
 {
+    [SerializeField] private Transform top;
+    [SerializeField] private Transform bottom;
+
     public GameObject grassPrefab;  // 풀 프리팹
     public int grassCount = 2;      // 최초 생성할 풀 개수
     private float y = 1f;           // 풀의 고정 Y 좌표
@@ -31,8 +34,8 @@ public class GrassManager : MonoBehaviour
     {
         for (int attempts = 0; attempts < 20; attempts++)
         {
-            float baseX = Random.Range(-8.5f, 12.5f);
-            float baseZ = Random.Range(-26.5f, -11.5f);
+            float baseX = Random.Range(top.position.x, bottom.position.x);
+            float baseZ = Random.Range(top.position.z, bottom.position.z);
 
             Vector3 center = new Vector3(Mathf.Round(baseX) + 0.5f, y, Mathf.Round(baseZ) + 0.5f);
             Vector2Int gridPos = MapManager.Instance.WorldToGrid(center);
@@ -70,7 +73,7 @@ public class GrassManager : MonoBehaviour
                 if (target != null && MapManager.Instance.CanAddGrass(target.Value))
                 {
                     // 중심 위치 + 타일 내 오프셋 적용
-                    Vector3 center = new Vector3(target.Value.x - 8f, y, target.Value.y - 26f);
+                    Vector3 center = new Vector3(target.Value.x, y, target.Value.y);
                     float offsetX = Random.Range(-0.3f, 0.3f);
                     float offsetZ = Random.Range(-0.3f, 0.3f);
                     Vector3 spawnPos = center + new Vector3(offsetX, 0, offsetZ);

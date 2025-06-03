@@ -1,9 +1,14 @@
+using System.Collections;
 using UnityEngine;
 
 public class WeatherSystem : MonoBehaviour
 {
+    [SerializeField] private float weatherChangeOffsetTime = 10f;
+    private float changeElapsedTime = 0f;
+
     [Header("Rain Settings")]
     public ParticleSystem rainParticleSystem;
+    public float percentage = 0.3f;
     public float rainMinDuration = 10f;        // 비 최소 시간
     public float rainMaxDuration = 20f;        // 비 최대 시간
     public float clearMinDuration = 10f;       // 맑은 최소 시간
@@ -26,32 +31,74 @@ public class WeatherSystem : MonoBehaviour
     {
         emissionModule = rainParticleSystem.emission;
         emissionModule.rateOverTime = 0f;
-        StartNewWeatherCycle();
+
+        StartCoroutine(CoWeatherSystem());
     }
 
     void Update()
     {
-        timer += Time.deltaTime;
+        return;
 
         if (isRaining)
         {
-            HandleRainTransition(true); // 비 내리는 중
+            Rain();
         }
-        else
+
+        if(windActive)
         {
-            HandleRainTransition(false); // 맑음
+            Wind();
+        }
+
+        changeElapsedTime += Time.deltaTime;
+        if (changeElapsedTime >= weatherChangeOffsetTime)
+        {
+            changeElapsedTime -= weatherChangeOffsetTime;
+
+            
         }
 
         HandleWindEffect();
     }
 
+    private void Wind()
+    {
+    }
+
     void StartNewWeatherCycle()
     {
+        if (isRaining || windActive)
+        {
+            return;
+        }
+
+        changeElapsedTime += Time.deltaTime;
+        if (changeElapsedTime > currentCycleDuration)
+        {
+
+        }
+
         isRaining = !isRaining;
         timer = 0f;
         currentCycleDuration = isRaining ?
             Random.Range(rainMinDuration, rainMaxDuration) :
             Random.Range(clearMinDuration, clearMaxDuration);
+    }
+
+    private float rainDuration = 0f;
+    private float rainElapsedTime = 0f;
+    private void Rain()
+    {
+        float t = timer / (transitionDuration / 2);
+        t = Mathf.Clamp01(t);
+        float smoothT = Mathf.SmoothStep(0f, 1f, t);
+
+        // 비 시작
+        if (timer < transitionDuration)
+            emissionModule.rateOverTime = Mathf.Lerp(0f, maxRainRate, smoothT);
+        else if (timer > currentCycleDuration)
+            isRaining = false;
+        else
+            emissionModule.rateOverTime = maxRainRate;
     }
 
     void HandleRainTransition(bool raining)
@@ -97,5 +144,56 @@ public class WeatherSystem : MonoBehaviour
         velocityOverLifetime.z = windDirection.z * dynamicStrength;
 
         // TODO: 다른 오브젝트에 영향 주고 싶다면 여기에서 Rigidbody.AddForce 등 추가 가능
+    }
+
+    private IEnumerator CoWeatherSystem()
+    {
+        yield return new WaitForSeconds(weatherChangeOffsetTime);
+
+        float n = Random.Range(0f, 10f);
+        if (n / 10 >= percentage)
+        {
+            isRaining = true;
+
+            changeElapsedTime = 0f;
+            rainDuration = Random.Range(rainMinDuration, rainMaxDuration);
+
+            StartCoroutine(CoRaining());
+        }
+        else
+        {
+            StartCoroutine(CoWeatherSystem());
+        }
+    }
+
+    private IEnumerator CoRaining()
+    {
+        while(true)
+        {
+            rainElapsedTime += Time.deltaTime;
+            float smoothT = rainElapsedTime / rainDuration;
+            if(rainElapsedTime < transitionDuration)
+            {
+                emissionModule.rateOverTime = Mathf.Lerp(0f, maxRainRate, smoothT);
+            }
+            else if(rainElapsedTime < rainDuration - transitionDuration)
+            {
+                emissionModule.rateOverTime = Mathf.Lerp(maxRainRate, 0f, smoothT);
+            }
+            else if(rainElapsedTime < rainDuration)
+            {
+                emissionModule.rateOverTime = 0f;
+
+                break;
+            }
+            else
+            {
+                emissionModule.rateOverTime = maxRainRate;
+            }
+
+            yield return null;
+        }
+
+        StartCoroutine(CoWeatherSystem());
     }
 }
