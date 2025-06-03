@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeerHealing : AnimalStateBehaviour
+public class WolfHealing : AnimalStateBehaviour
 {
     public override void OnEnter()
     {
@@ -16,8 +16,8 @@ public class DeerHealing : AnimalStateBehaviour
 
     public override bool Update()
     {
-        animal.BaseStatus.health = 
-            Mathf.Clamp(animal.BaseStatus.health + animal.BaseStatus.addHealthByHealingSec * Time.deltaTime, 
+        animal.BaseStatus.health =
+            Mathf.Clamp(animal.BaseStatus.health + animal.BaseStatus.addHealthByHealingSec * Time.deltaTime,
             0f, animal.BaseStatus.maxHealth);
         return true;
     }

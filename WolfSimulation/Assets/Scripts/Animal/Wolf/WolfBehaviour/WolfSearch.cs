@@ -1,17 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
-public class DeerSearch : AnimalStateBehaviour
+public class WolfSearch : AnimalStateBehaviour
 {
     private Vector3 searchDir = Vector3.zero;
     private enum SearchType
     {
         None,
         SearchPack,
-        SearchGrass,
+        SearchDeer,
         SearchBoth,
         MAX
     }
@@ -29,20 +27,20 @@ public class DeerSearch : AnimalStateBehaviour
 
     public override void OnReset()
     {
-        int grassCount = animal.GrassList.Count;
         int deerCount = animal.DeerList.Count;
+        int wolfCount = animal.WolfList.Count;
 
-        if (grassCount > 0 && deerCount == 0) // 풀은 있는데 무리가 없음
+        if (deerCount > 0 && wolfCount == 0) // 먹이는 있는데 무리가 없음
         {
             searchType = SearchType.SearchPack;
-            MoveToGrass();
+            MoveToDeer();
         }
-        else if (deerCount > 0 && grassCount == 0) // 무리는 있는데 풀이 없음
+        else if (wolfCount > 0 && deerCount == 0) // 무리는 있는데 먹이 없음
         {
-            searchType = SearchType.SearchGrass;
+            searchType = SearchType.SearchDeer;
             FollowPack();
         }
-        else // deerCount == 0 && grassCount == 0 >> 무리도 풀도 없음
+        else // deerCount == 0 && grassCount == 0 >> 무리도 먹이도 없음
         {
             searchType = SearchType.SearchBoth;
             SearchRandom();
@@ -78,14 +76,14 @@ public class DeerSearch : AnimalStateBehaviour
         return false;
     }
 
-    private void MoveToGrass()
+    private void MoveToDeer()
     {
         // 무리가 없긴하지만, 일단 있는 자원인 풀 쪽으로 향하는 것이 생존상 유리
 
         animal.UpdateEnviroment();
 
-        Grass targetG = animal.GrassList[animal.GrassList.Count / 2]; // 적당한 거리의 풀을 선택
-        searchDir = (targetG.transform.position - animal.transform.position).normalized;
+        Deer targetD = animal.DeerList[animal.DeerList.Count / 2]; // 적당한 거리의 풀을 선택
+        searchDir = (targetD.transform.position - animal.transform.position).normalized;
         searchDir.y = 0f;
         searchDir = searchDir.normalized;
     }
@@ -94,8 +92,8 @@ public class DeerSearch : AnimalStateBehaviour
     {
         // 무리가 향하는 방향 => 풀이 있을 가능성 높음
         Vector3 center = Vector3.zero;
-        foreach (var deer in animal.DeerList)
-            center += deer.transform.position;
+        foreach (var wolf in animal.WolfList)
+            center += wolf.transform.position;
         center /= animal.DeerList.Count;
 
         searchDir = (center - animal.transform.position).normalized;

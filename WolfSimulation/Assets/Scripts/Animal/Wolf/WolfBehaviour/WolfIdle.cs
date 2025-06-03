@@ -1,17 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
-public class DeerIdle : AnimalStateBehaviour
+public class WolfIdle : AnimalStateBehaviour
 {
     private float elapsedTime = 0f;
     private float randomActTime = 2f;
 
     public override void OnEnter()
     {
-        animal.anim.SetBool(DeerAnimation.IsWalking, false);
-        animal.anim.SetBool(DeerAnimation.IsRunning, false);
+        animal.anim.SetBool(WolfAnimation.IsWalking, false);
+        animal.anim.SetBool(WolfAnimation.IsChasing, false);
 
         elapsedTime = 0f;
     }
@@ -34,9 +33,9 @@ public class DeerIdle : AnimalStateBehaviour
 
             int randomNum = Random.Range(0, 20);
             if (randomNum < 2)
-                animal.anim.SetTrigger(DeerAnimation.IdleRandom1);
+                animal.anim.SetTrigger(WolfAnimation.IdleRandom1);
             else if (randomNum < 4)
-                animal.anim.SetTrigger(DeerAnimation.IdleRandom2);
+                animal.anim.SetTrigger(WolfAnimation.IdleRandom2);
         }
 
         animal.BaseStatus.stamina = Mathf.Clamp(animal.BaseStatus.stamina + animal.BaseStatus.addStaminaBySec * Time.deltaTime,

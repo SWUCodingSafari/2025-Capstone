@@ -28,6 +28,11 @@ public class AnimalStatus :MonoBehaviour
     [SerializeField] public float subStaminaByMateSec = 0.8f;
     [SerializeField] public float addStaminaBySec = 1.5f;
 
+    [Header("Fear")]
+    [SerializeField] public float fear = 0f;
+    [SerializeField] public float maxFear = 10f;
+    [SerializeField] public float subfearBySec = 1f;
+
     [Header("Mate")]
     [SerializeField] public float urgeToMate = 3f;
     [SerializeField] public float maxUrgeToMate = 3f;

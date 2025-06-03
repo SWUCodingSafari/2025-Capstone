@@ -11,7 +11,7 @@ public abstract class Animal : MonoBehaviour
     [SerializeField] public Rigidbody rigid;
     [SerializeField] public Renderer rend;
     [SerializeField] public Collider sight;
-    [SerializeField] public Animator animator;
+    [SerializeField] public AnimalAnimation anim;
 
     [field: SerializeField]
     public AnimalStatus BaseStatus { get; set; }
@@ -33,7 +33,7 @@ public abstract class Animal : MonoBehaviour
 
     public bool IsDied { get; set; }
 
-    protected bool lookingForMate = false;
+    [SerializeField] protected bool lookingForMate = false;
     public bool LookingForMate
     {
         get => lookingForMate;
@@ -56,10 +56,9 @@ public abstract class Animal : MonoBehaviour
     protected virtual void Init()
     {
         BaseStatus.health = BaseStatus.maxHealth;
-
         BaseStatus.hunger = 0f;
-
         BaseStatus.urgeToMate = 0f;
+        BaseStatus.fear = 0f;
 
         (sight as SphereCollider).radius = BaseStatus.viewDist;
         mat = rend?.material;
@@ -223,8 +222,9 @@ public abstract class Animal : MonoBehaviour
     public virtual void Mate(Animal _mateAnimal = null) { }
     public virtual void MateOver(Animal _mateAnimal = null) { }
 
-    public void MovePosition()
+    public void MovePosition(float _moveSpeed = -1f)
     {
+        if(_moveSpeed < 0f) _moveSpeed = BaseStatus.moveSpeed;
         rigid.MovePosition(transform.position + transform.forward * BaseStatus.moveSpeed * Time.deltaTime);
     }
 
@@ -238,7 +238,7 @@ public abstract class Animal : MonoBehaviour
     public virtual void Die()
     {
         // todo.
-        Destroy(gameObject, 1f);
+        Destroy(gameObject, 5f);
     }
 
     protected abstract void GiveBirth(Animal _other);

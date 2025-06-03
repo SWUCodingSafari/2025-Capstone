@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeerMate : AnimalStateBehaviour
+public class WolfMate : AnimalStateBehaviour
 {
     private float elapsedTime = 0f;
 

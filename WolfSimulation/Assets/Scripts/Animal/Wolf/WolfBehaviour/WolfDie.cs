@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeerDie : AnimalStateBehaviour
+public class WolfDie : AnimalStateBehaviour
 {
 
     public override void OnEnter()

@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.VisualScripting;
 
 public class Deer : Animal
 {
@@ -66,6 +64,8 @@ public class Deer : Animal
     private AnimalStateBehaviour[] stateBehaviours = 
         new AnimalStateBehaviour[(int)DeerState.MAX];
 
+    [SerializeField] private int meat = 10;
+
     protected override void Init()
     {
         base.Init();
@@ -94,7 +94,7 @@ public class Deer : Animal
             return DeerState.Die;
         }
 
-        float runPoint = WolfList.Count + DeerList.Count(_ => _.State == DeerState.Run);
+        float runPoint = WolfList.Count + DeerList.Count(_ => _.State == DeerState.Run) + BaseStatus.fear;
         if (runPoint > 0)
             return DeerState.Run;
 
@@ -129,8 +129,9 @@ public class Deer : Animal
 
         // ÀÌµ¿ ÆÑÅÍ
         float distance = DeerList.Count > 0 ? (DeerList[0].transform.position - transform.position).magnitude : -1f;
-        stateFactors[(int)DeerState.Move] = (CheckState(DeerState.Eat) || distance < 0f ? 0f :
-            Mathf.Abs(distance - BaseStatus.maxClusterDistance) * BaseStatus. moveAdder);
+        bool move = Random.Range(0, 10) < 7;
+        stateFactors[(int)DeerState.Move] = (move == false || ((CheckState(DeerState.Eat) || distance < 0f)) ? 0f :
+            Mathf.Abs(distance - BaseStatus.maxClusterDistance) * BaseStatus.moveAdder);
 
         // ¹ø½Ä ÆÑÅÍ
         bool canMate = CheckIfThisCanMate();
@@ -199,8 +200,11 @@ public class Deer : Animal
             {
                 return 1;
             }
-            else
+            else if ((a.transform.position - transform.position).sqrMagnitude >
+            (b.transform.position - transform.position).sqrMagnitude)
                 return -1;
+            else 
+                return 0;
         });
 
         // »ç½¿ Á¤·Ä (°¡±î¿î ¼ø)
@@ -238,12 +242,14 @@ public class Deer : Animal
     {
         base.BehaviourCycle();
 
+        BaseStatus.fear = Mathf.Clamp(BaseStatus.fear - BaseStatus.subfearBySec * Time.deltaTime, 0f, BaseStatus.maxFear);
 
         float subBySec = CheckState(DeerState.MAX) ? BaseStatus.subStaminaByWalkSec :
             stateBehaviours[(int)state].ReducedStamina();
         BaseStatus.stamina = Mathf.Clamp(BaseStatus.stamina - subBySec * Time.deltaTime, 0f, BaseStatus.maxStamina);
 
-        stateBehaviours[(int)state].OnBehaviourCycle();
+        if(CheckState(DeerState.MAX) == false)
+            stateBehaviours[(int)state].OnBehaviourCycle();
     }
 
     public override void OnEnviromentChanged()
@@ -325,7 +331,7 @@ public class Deer : Animal
         bool hasGrass = GrassList.Count(g => g.IsGrown == true && g.reservedBy == null) >= 2;
         bool urgeIsEnough = BaseStatus.urgeToMate >= BaseStatus.maxUrgeToMate;
 
-        return isHealthy && isFull && hasGroup && safe && hasGrass;
+        return isHealthy && isFull && hasGroup && safe && hasGrass && urgeIsEnough;
     }
 
     protected override void GiveBirth(Animal _other)
@@ -338,6 +344,17 @@ public class Deer : Animal
     {
         BaseStatus.health = Mathf.Clamp(BaseStatus.health - _value, 0, BaseStatus.maxHealth);
         OnEnviromentChanged();
+    }
+
+    public bool GetEaten()
+    {
+        meat = Mathf.Clamp(meat - 1, 0, 10);
+        if (meat <= 0)
+        {
+            Destroy(gameObject);
+        }
+
+        return meat > 0;
     }
 
     protected override void OnTriggerEnter(Collider other)

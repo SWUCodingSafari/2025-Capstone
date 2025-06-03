@@ -1,10 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
-public class DeerMove : AnimalStateBehaviour
+public class WolfMove : AnimalStateBehaviour
 {
     private Vector3 moveTargetDir = Vector3.zero;
 
@@ -30,13 +28,13 @@ public class DeerMove : AnimalStateBehaviour
 
     private void SetMoveDir()
     {
-        const int MaxCalDeerCount = 5;
+        const int MaxCalWolfCount = 5;
         Vector3 separation = Vector3.zero;
         Vector3 alignment = Vector3.zero;
         Vector3 cohesion = Vector3.zero;
         int count = 0;
 
-        foreach (var neighbor in animal.DeerList)
+        foreach (var neighbor in animal.WolfList)
         {
             if (neighbor.IsDied == true)
                 continue;
@@ -57,7 +55,7 @@ public class DeerMove : AnimalStateBehaviour
             cohesion += neighbor.transform.position;
 
             count++;
-            if (count >= MaxCalDeerCount)
+            if (count >= MaxCalWolfCount)
             {
                 break;
             }
