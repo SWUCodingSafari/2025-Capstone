@@ -12781,7 +12781,7 @@ MonoBehaviour:
   deer: {fileID: 2420803830891764594, guid: 63027905339f4244f97af6a2cd0254c9, type: 3}
   spawnCountDeer: 3
   wolf: {fileID: 2420803830891764594, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
-  spawnCountWolf: 2
+  spawnCountWolf: 0
 --- !u!4 &481311441 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7043803405216327146, guid: 80dc9808a443bf24c8520ba3efc7308c, type: 3}

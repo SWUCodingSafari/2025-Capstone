@@ -188,7 +188,7 @@ MonoBehaviour:
   heallingAdder: 5
   mateAdder: 3
   moveAdder: 2
-  hysteresisAdder: 2
+  hysteresisAdder: 3
   damage: 1.5
   attackRange: 1.5
   attackCoolTime: 1

@@ -56,6 +56,7 @@ MonoBehaviour:
   sight: {fileID: 7235371245526099791}
   anim: {fileID: 8967349001824857749}
   <BaseStatus>k__BackingField: {fileID: 6349542649922981449}
+  lookingForMate: 0
   id: 0
   state: 0
   stateFactors:
@@ -67,6 +68,7 @@ MonoBehaviour:
   - 0
   - 0
   - 0
+  meat: 10
 --- !u!114 &6349542649922981449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,6 +119,9 @@ MonoBehaviour:
   subStaminaByRunSec: 1
   subStaminaByMateSec: 0.8
   addStaminaBySec: 1.5
+  fear: 0
+  maxFear: 10
+  subfearBySec: 1
   urgeToMate: 3
   maxUrgeToMate: 3
   subUrgeToMateAfterMate: 6
@@ -135,7 +140,7 @@ MonoBehaviour:
   heallingAdder: 5
   mateAdder: 3
   moveAdder: 2
-  hysteresisAdder: 2
+  hysteresisAdder: 3
 --- !u!54 &4795173001578239592
 Rigidbody:
   m_ObjectHideFlags: 0

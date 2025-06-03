@@ -66,6 +66,7 @@ public class AnimalStatus :MonoBehaviour
 
     public virtual AnimalStatus GetNewStatus(AnimalStatus _that)
     {
+        // todo: 유전 알고리즘
         return this;
     }
 }

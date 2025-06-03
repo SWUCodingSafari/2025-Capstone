@@ -29,7 +29,7 @@ public class DeerSpawner : MonoBehaviour
             GameObject d = Instantiate(deer, spawnPosition, Quaternion.identity);
         }
 
-        for (int i = 0; i < spawnCountDeer; i++)
+        for (int i = 0; i < spawnCountWolf; i++)
         {
             float randomX = Mathf.Round(Random.Range(bottom.position.x + 7f, top.position.x - 9f)) + 0.5f;
             float randomZ = Mathf.Round(Random.Range(bottom.position.z + 8f, top.position.z - 8f)) + 0.5f;
