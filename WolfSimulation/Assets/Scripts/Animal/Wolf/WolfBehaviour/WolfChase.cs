@@ -14,6 +14,7 @@ public class WolfChase : AnimalStateBehaviour
         animal.anim.SetBool(WolfAnimation.IsChasing, true);
 
         status = animal.BaseStatus as WolfStatus;
+        targetDeer = SetTarget();
     }
 
     public override void OnExit()
@@ -23,10 +24,6 @@ public class WolfChase : AnimalStateBehaviour
 
     public override bool Update()
     {
-        targetDeer = SetTarget();
-        if (targetDeer == null)
-            return true;
-
         Debug.Log($"Target id: {targetDeer.id}, ({animal.id})");
 
         Vector3 subVec = targetDeer.transform.position - animal.transform.position;
@@ -42,6 +39,11 @@ public class WolfChase : AnimalStateBehaviour
                 elapsedTime -= status.attackCoolTime;
                 animal.anim.SetTrigger(WolfAnimation.Attack);
 
+                (animal as Wolf).Attack(targetDeer);
+                if(targetDeer.IsDied == true)
+                {
+                    return true;
+                }
             }
         }
 

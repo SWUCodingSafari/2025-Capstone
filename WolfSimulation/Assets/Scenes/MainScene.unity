@@ -19992,7 +19992,7 @@ MonoBehaviour:
   deer: {fileID: 2420803830891764594, guid: 63027905339f4244f97af6a2cd0254c9, type: 3}
   spawnCountDeer: 5
   wolf: {fileID: 2420803830891764594, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
-  spawnCountWolf: 2
+  spawnCountWolf: 0
 --- !u!114 &747150119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30891,7 +30891,7 @@ MonoBehaviour:
   top: {fileID: 1998330827}
   bottom: {fileID: 1451076021}
   grassPrefab: {fileID: 5707813131339405077, guid: a8e14495a0eed234b80b911e2d31b901, type: 3}
-  grassCount: 10
+  grassCount: 50
 --- !u!4 &1195329809
 Transform:
   m_ObjectHideFlags: 0

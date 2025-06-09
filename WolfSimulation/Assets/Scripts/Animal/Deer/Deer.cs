@@ -129,18 +129,18 @@ public class Deer : Animal
 
         // 이동 팩터
         float distance = DeerList.Count > 0 ? (DeerList[0].transform.position - transform.position).magnitude : -1f;
-        bool move = Random.Range(0, 10) < 7;
+        bool move = Random.Range(0, 10) < 3;
         stateFactors[(int)DeerState.Move] = (move == false || ((CheckState(DeerState.Eat) || distance < 0f)) ? 0f :
             Mathf.Abs(distance - BaseStatus.maxClusterDistance) * BaseStatus.moveAdder);
 
         // 번식 팩터
         bool canMate = CheckIfThisCanMate();
-        if (lookingForMate != canMate && canMate == true)
+        if (LookingForMate != canMate && canMate == true)
         {
             // 지금 번식 가능해짐
             Mate();
         }
-        lookingForMate = canMate; // 번식 가능여부
+        LookingForMate = canMate; // 번식 가능여부
         //stateFactors[(int)DeerState.Mate] = 
         //    (isHealthy && isFull && hasGroup && safe && hasGrass ? 1f : 0f) * BaseStatus.mateAdder;
 
@@ -261,6 +261,9 @@ public class Deer : Animal
 
     public override void OnEnviromentChanged()
     {
+        if (IsDied == true)
+            return;
+
         // 환경 조건 정리
         UpdateEnviroment();
 
@@ -295,8 +298,9 @@ public class Deer : Animal
         return state == _checkState;
     }
 
-    public override void Mate(Animal _mateAnimal = null)
+    public override void Mate(Animal _mateAnimal = null, bool isRequested = false)
     {
+        Debug.Log($"{id} want to mate");
         if (_mateAnimal == null) // 이제 짝 찾기
         {
             mate = AnimalManager<Deer>.Instance.WantMate(this);
@@ -311,12 +315,18 @@ public class Deer : Animal
             return;
         }
 
-        mate.Mate(this);
+        if (isRequested == false)
+        {
+            mate.Mate(this, true);
+        }
         SelectStateAndBehave((int)DeerState.Mate);
     }
 
     public override void MateOver(Animal _mateAnimal = null)
     {
+        if (IsMating == false)
+            return;
+
         IsMating = false;
         BaseStatus.urgeToMate -= BaseStatus.subUrgeToMateAfterMate;
 
@@ -326,17 +336,17 @@ public class Deer : Animal
             GiveBirth(mate);
         }
 
-        OnEnviromentChanged();
+        SelectStateAndBehave((int)DeerState.Idle);
     }
 
     public override bool CheckIfThisCanMate()
     {
         bool isHealthy = BaseStatus.health >= BaseStatus.maxHealth * 0.5f;
-        bool isFull = BaseStatus.hunger / BaseStatus.maxHunger >= 0.3f;
+        bool isFull = BaseStatus.hunger / BaseStatus.maxHunger <= 0.3f;
         bool hasGroup = PackNumber >= 0;
-        bool safe = !CheckState(DeerState.Run);
-        bool hasGrass = GrassList.Count(g => g.IsGrown == true && g.reservedBy == null) >= 2;
-        bool urgeIsEnough = BaseStatus.urgeToMate >= BaseStatus.maxUrgeToMate;
+        bool safe = CheckState(DeerState.Run) == false;
+        bool hasGrass = GrassList.Count(g => g.IsGrown == true && g.reservedBy == null) > 0;
+        bool urgeIsEnough = BaseStatus.urgeToMate >= BaseStatus.maxUrgeToMate * 0.5f;
 
         return isHealthy && isFull && hasGroup && safe && hasGrass && urgeIsEnough;
     }

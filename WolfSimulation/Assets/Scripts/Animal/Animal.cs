@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.IO.LowLevel.Unsafe;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
@@ -31,9 +32,13 @@ public abstract class Animal : MonoBehaviour
     protected delegate bool _CurrentBehaviour();
     protected _CurrentBehaviour currentBehaviour;
 
-    public bool IsDied { get; set; }
+    private bool isDied = false;
+    public bool IsDied { 
+        get => isDied; 
+        set { isDied = value; Debug.Log("die"); } 
+    }
 
-    [SerializeField] protected bool lookingForMate = false;
+    [SerializeField] private bool lookingForMate = false;
     public bool LookingForMate
     {
         get => lookingForMate;
@@ -71,6 +76,11 @@ public abstract class Animal : MonoBehaviour
         BaseStatus.wfLoosePack = new WaitForSeconds(BaseStatus.loosePackTime);
     }
 
+    private void FixedUpdate()
+    {
+        rigid.angularVelocity = Vector3.zero;
+    }
+
     public virtual void Update()
     {
         if (IsDied == true)
@@ -104,6 +114,9 @@ public abstract class Animal : MonoBehaviour
     #region LookOutEnviroment
     protected virtual void OnTriggerEnter(Collider other)
     {
+        if (IsDied == true)
+            return;
+
         //if( true /* todo: 시야 거리 관련 조건 필요 시 추가*/ )
         {
             CheckTriggedObjAndAdd(other);
@@ -112,6 +125,9 @@ public abstract class Animal : MonoBehaviour
 
     protected virtual void OnTriggerExit(Collider other)
     {
+        if (IsDied == true)
+            return;
+
         //if( true /* todo: 시야 거리 관련 조건 필요 시 추가*/ )
         {
             CheckTriggerObjAndRemove(other);
@@ -219,7 +235,7 @@ public abstract class Animal : MonoBehaviour
     {
         return false;
     }
-    public virtual void Mate(Animal _mateAnimal = null) { }
+    public virtual void Mate(Animal _mateAnimal = null, bool isRequested = false) { }
     public virtual void MateOver(Animal _mateAnimal = null) { }
 
     public void MovePosition(float _moveSpeed = -1f)

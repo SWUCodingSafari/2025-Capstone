@@ -54,6 +54,9 @@ public class AnimalStatus :MonoBehaviour
     public WaitForSeconds wfLoosePack;
     public Coroutine coLoosePack = null;
 
+    [Header("Position")]
+    [SerializeField] public float independence = 0.5f;
+
     [Header("PointAdder")]
     [SerializeField] public float hungerToRestAdder = 3f;
     [SerializeField] public float eatAdder = 2f;
@@ -63,10 +66,11 @@ public class AnimalStatus :MonoBehaviour
     [SerializeField] public float moveAdder = 7f;
     [SerializeField] public float hysteresisAdder = 2f;
 
-
     public virtual AnimalStatus GetNewStatus(AnimalStatus _that)
     {
         // todo: 유전 알고리즘
-        return this;
+        AnimalStatus newStatus = new AnimalStatus();
+        newStatus = this;
+        return newStatus;
     }
 }

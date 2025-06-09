@@ -40,7 +40,11 @@ public class DeerSearch : AnimalStateBehaviour
         else if (deerCount > 0 && grassCount == 0) // 무리는 있는데 풀이 없음
         {
             searchType = SearchType.SearchGrass;
-            FollowPack();
+            int n = Random.Range(0, 10);
+            if(n / 10 <= animal.BaseStatus.independence)
+                FollowPack();
+            else
+                SearchRandom();
         }
         else // deerCount == 0 && grassCount == 0 >> 무리도 풀도 없음
         {

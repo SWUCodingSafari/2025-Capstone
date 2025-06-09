@@ -176,9 +176,9 @@ MonoBehaviour:
   mateTime: 2
   addUrgeToMateBySec: 0.3
   viewDist: 5
-  moveSpeed: 4
+  moveSpeed: 10
   runSpeed: 20
-  maxTurnAngleBySec: 60
+  maxTurnAngleBySec: 360
   maxClusterDistance: 3
   minClusterDistance: 1.5
   loosePackTime: 5
@@ -189,7 +189,7 @@ MonoBehaviour:
   mateAdder: 3
   moveAdder: 2
   hysteresisAdder: 3
-  damage: 1.5
+  damage: 4
   attackRange: 1.5
   attackCoolTime: 1
   slowAfterAttack: 0.7
