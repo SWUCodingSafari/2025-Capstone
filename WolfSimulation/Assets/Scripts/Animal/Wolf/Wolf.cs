@@ -250,6 +250,9 @@ public class Wolf : Animal
 
     protected override void SelectStateAndBehave(int _newState = -1)
     {
+        if (IsDied == true)
+            return;
+
         var newState = _newState >= 0 ? (WolfState)_newState : ChangeState();
 
         // 이미 그 행동을 진행 중
@@ -301,6 +304,9 @@ public class Wolf : Animal
 
     public override void MateOver(Animal _mateAnimal = null)
     {
+        if (IsMating == false)
+            return;
+
         IsMating = false;
         BaseStatus.urgeToMate -= BaseStatus.subUrgeToMateAfterMate;
 
@@ -310,7 +316,7 @@ public class Wolf : Animal
             GiveBirth(mate);
         }
 
-        OnEnviromentChanged();
+        SelectStateAndBehave((int)DeerState.Idle);
     }
 
     public override bool CheckIfThisCanMate()

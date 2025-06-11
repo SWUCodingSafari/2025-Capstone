@@ -32,10 +32,13 @@ public abstract class Animal : MonoBehaviour
     protected delegate bool _CurrentBehaviour();
     protected _CurrentBehaviour currentBehaviour;
 
-    private bool isDied = false;
+    private bool isDied;
     public bool IsDied { 
         get => isDied; 
-        set { isDied = value; Debug.Log("die"); } 
+        set { 
+            Debug.Log($"die {value}"); 
+            isDied = value; 
+        } 
     }
 
     [SerializeField] private bool lookingForMate = false;

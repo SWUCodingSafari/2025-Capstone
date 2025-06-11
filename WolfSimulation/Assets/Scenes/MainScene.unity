@@ -19990,9 +19990,9 @@ MonoBehaviour:
   top: {fileID: 1998330827}
   bottom: {fileID: 1451076021}
   deer: {fileID: 2420803830891764594, guid: 63027905339f4244f97af6a2cd0254c9, type: 3}
-  spawnCountDeer: 5
+  spawnCountDeer: 1
   wolf: {fileID: 2420803830891764594, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
-  spawnCountWolf: 0
+  spawnCountWolf: 2
 --- !u!114 &747150119
 MonoBehaviour:
   m_ObjectHideFlags: 0

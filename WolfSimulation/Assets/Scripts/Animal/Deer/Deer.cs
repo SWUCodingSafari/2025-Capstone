@@ -64,6 +64,8 @@ public class Deer : Animal
     private AnimalStateBehaviour[] stateBehaviours = 
         new AnimalStateBehaviour[(int)DeerState.MAX];
 
+    [Header("Hunted")]
+    [SerializeField] private int beingChased = 0;
     [SerializeField] private int meat = 10;
 
     protected override void Init()
@@ -272,6 +274,9 @@ public class Deer : Animal
 
     protected override void SelectStateAndBehave(int _newState = -1)
     {
+        if (IsDied == true)
+            return;
+
         var newState = _newState >= 0 ? (DeerState)_newState : ChangeState();
 
         // 이미 그 행동을 진행 중
@@ -408,6 +413,8 @@ public class Deer : Animal
             BaseStatus.coLoosePack = StartCoroutine(CoLoosePack<Deer>());
         }
     }
+
+
 
     private void OnDestroy()
     {
