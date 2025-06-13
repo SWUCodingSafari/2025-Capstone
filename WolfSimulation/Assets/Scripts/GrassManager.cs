@@ -7,17 +7,24 @@ public class GrassManager : MonoBehaviour
     [SerializeField] private Transform top;
     [SerializeField] private Transform bottom;
 
-    public GameObject grassPrefab;  // 풀 프리팹
-    public int grassCount = 2;      // 최초 생성할 풀 개수
-    private float y = 1f;           // 풀의 고정 Y 좌표
+    public GameObject grassPrefab;
+    public int grassCount = 2;
+    private float y = 1f;
+    public WindZone windZone; // WindZone은 WeatherSystem이 제어
+
+    private Vector3 GetWindDirection()
+    {
+        if (windZone == null) return Vector3.zero;
+
+        // 바람 방향 (forward 방향) * 세기
+        return windZone.transform.forward.normalized * windZone.windMain;
+    }
 
     void Start()
     {
-        // 시작 시 풀 생성
         SpawnGrassRandomly();
     }
 
-    // 지정한 수만큼 랜덤 위치에 풀 생성
     void SpawnGrassRandomly()
     {
         for (int i = 0; i < grassCount; i++)
@@ -25,11 +32,10 @@ public class GrassManager : MonoBehaviour
             TrySpawnGrass();
         }
 
-        // 5초마다 번식 시도 반복
+        // 주기적으로 번식 시도
         InvokeRepeating(nameof(TryBreedingTurn), 5f, 5f);
     }
 
-    // 랜덤한 타일에 풀 생성 시도 (타일당 최대 2개까지)
     void TrySpawnGrass()
     {
         for (int attempts = 0; attempts < 20; attempts++)
@@ -42,7 +48,6 @@ public class GrassManager : MonoBehaviour
 
             if (MapManager.Instance.CanAddGrass(gridPos))
             {
-                // 타일 내에서 약간 랜덤한 위치에 생성
                 float offsetX = Random.Range(-0.3f, 0.3f);
                 float offsetZ = Random.Range(-0.3f, 0.3f);
                 Vector3 spawnPos = center + new Vector3(offsetX, 0, offsetZ);
@@ -55,7 +60,6 @@ public class GrassManager : MonoBehaviour
         }
     }
 
-    // 2개의 풀을 선택해 번식 시도
     void TryBreedingTurn()
     {
         int retryCount = 0;
@@ -67,13 +71,18 @@ public class GrassManager : MonoBehaviour
 
             int successCount = 0;
 
+            Vector3 windDir = GetWindDirection();
+            bool useWind = windDir.magnitude > 0.1f; // 바람 세기가 충분할 때만 방향 기반
+
             foreach (var parent in parents)
             {
-                Vector2Int? target = MapManager.Instance.GetRandomEmptyNeighbor(parent);
+                Vector2Int? target = useWind
+                    ? MapManager.Instance.GetDirectionalEmptyNeighbor(parent, windDir)
+                    : MapManager.Instance.GetRandomEmptyNeighbor(parent);
+
                 if (target != null && MapManager.Instance.CanAddGrass(target.Value))
                 {
-                    // 중심 위치 + 타일 내 오프셋 적용
-                    Vector3 center = new Vector3(target.Value.x, y, target.Value.y);
+                    Vector3 center = new Vector3(target.Value.x - 8.5f + 0.5f, y, target.Value.y - 26.5f + 0.5f);
                     float offsetX = Random.Range(-0.3f, 0.3f);
                     float offsetZ = Random.Range(-0.3f, 0.3f);
                     Vector3 spawnPos = center + new Vector3(offsetX, 0, offsetZ);
@@ -85,7 +94,6 @@ public class GrassManager : MonoBehaviour
                 }
             }
 
-            // 둘 다 성공하면 종료
             if (successCount == 2) break;
             if (++retryCount > 10) break;
         }

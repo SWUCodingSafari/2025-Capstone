@@ -38,7 +38,16 @@ public class MapManager : MonoBehaviour
     // 해당 좌표에 풀을 더 추가할 수 있는지 확인
     public bool CanAddGrass(Vector2Int pos)
     {
-        return IsValid(pos) && tileGrassCount[pos.x, pos.y] < maxGrassPerTile;
+        // return IsValid(pos) && tileGrassCount[pos.x, pos.y] < maxGrassPerTile;
+
+        bool valid = IsValid(pos);
+        if (!valid)
+            Debug.LogWarning($"Invalid tile position: {pos}");
+
+        if (valid && tileGrassCount[pos.x, pos.y] >= maxGrassPerTile)
+            Debug.Log($"Tile full: {pos}");
+
+        return valid && tileGrassCount[pos.x, pos.y] < maxGrassPerTile;
     }
 
     // 해당 타일에 풀을 하나 등록
@@ -116,5 +125,47 @@ public class MapManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    public Vector2Int? GetDirectionalEmptyNeighbor(Vector2Int center, Vector3 windDir)
+    {
+        List<Vector2Int> candidates = new List<Vector2Int>();
+        List<float> weights = new List<float>();
+
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                Vector2Int neighbor = new Vector2Int(center.x + dx, center.y + dy);
+                if (CanAddGrass(neighbor))
+                {
+                    candidates.Add(neighbor);
+
+                    // 방향 가중치: windDir 기준
+                    Vector3 dir = new Vector3(dx, 0, dy).normalized;
+                    float dot = Vector3.Dot(dir, windDir.normalized);
+                    weights.Add(Mathf.Max(dot, 0.01f)); // 음수 제거
+                }
+            }
+        }
+
+        if (candidates.Count == 0) return null;
+
+        // 확률 기반 선택
+        float total = 0;
+        foreach (var w in weights) total += w;
+
+        float rnd = Random.Range(0, total);
+        float sum = 0;
+        for (int i = 0; i < candidates.Count; i++)
+        {
+            sum += weights[i];
+            if (rnd <= sum)
+                return candidates[i];
+        }
+
+        return candidates[0];
     }
 }

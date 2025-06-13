@@ -4,31 +4,31 @@ using UnityEngine;
 
 public class Grass : MonoBehaviour
 {
-    public float growDuration = 3f;             // Ǯ ���� �ð� (��)
-    public float regrowDelay = 2f;              // ���� �� ��������� ��� �ð� (��)
-    public Vector3 maxScale = new Vector3(5f, 5f, 5f); // �ִ� ���� �� ũ��
+    public float growDuration = 3f;             // 풀 성장 시간 (초)
+    public float regrowDelay = 2f;              // 먹힌 후 재생성까지 대기 시간 (초)
+    public Vector3 maxScale = new Vector3(5f, 5f, 5f); // 최대 성장 시 크기
 
-    private Vector3 initialScale = Vector3.zero;   // �ʱ� ũ��
-    private bool isGrown = false;                  // �� �ڶ� ���� ����
-    public bool IsGrown { get => isGrown; }        // �ܺ� ���ٿ� getter
-    private bool isEaten = false;                  // ���� ���� ����
-    private float growTimer = 0f;                  // ���� �ð� ������
+    private Vector3 initialScale = Vector3.zero;   // 초기 크기
+    private bool isGrown = false;                  // 다 자란 상태인지 여부
+    public bool IsGrown { get => isGrown; }        // 외부 접근용 Getter
+    private bool isEaten = false;                  // 먹혔는지 여부
+    private float growTimer = 0f;                  // 성장 시간 누적
 
-    public GameObject reservedBy { get; set; }     // (����) AI�� ���� �� ���
+    public GameObject reservedBy { get; set; }     // (선택) AI가 예약한 오브젝트
 
     void Start()
     {
-        transform.localScale = initialScale;       // ó���� ũ�� 0���� ����
-        StartCoroutine(Grow());                    // ���� �ڷ�ƾ ����
+        transform.localScale = initialScale;       // 시작 시 크기를 0으로 설정
+        StartCoroutine(Grow());                    // 성장 코루틴 시작
     }
 
     void Update()
     {
-        // �ڶ�� ���� ���� ũ�� ���� ó��
+        // 자라는 중일 때만 크기 증가 처리
         if (!isGrown && !isEaten)
         {
             growTimer += Time.deltaTime;
-            float progress = Mathf.Clamp01(growTimer / growDuration); // 0~1 ����
+            float progress = Mathf.Clamp01(growTimer / growDuration); // 0~1 사이 비율
             transform.localScale = Vector3.Lerp(initialScale, maxScale, progress);
 
             if (progress >= 1f)
@@ -38,12 +38,12 @@ public class Grass : MonoBehaviour
 
     public void OnMouseDown()
     {
-        Eaten();
+        Eaten(); // 마우스로 클릭했을 때 먹히는 함수 호출
     }
 
     public void Eaten()
     {
-        Debug.Log("Ŭ����");
+        Debug.Log("클릭됨");
 
         if (isGrown && !isEaten)
         {
@@ -53,17 +53,17 @@ public class Grass : MonoBehaviour
 
     IEnumerator Grow()
     {
-        // �ڶ�� ���� (�ʱ�ȭ)
+        // 성장 초기화
         isGrown = false;
         isEaten = false;
         growTimer = 0f;
         transform.localScale = initialScale;
-        yield return null; // ������ �� �� ��
+        yield return null; // 다음 프레임까지 대기
     }
 
     IEnumerator EatGrass()
     {
-        // Ǯ�� ������ �������, ���� �ð� �� �缺�� ����
+        // 풀을 먹고, 재생성까지 대기한 뒤 다시 성장
         isEaten = true;
         transform.localScale = Vector3.zero;
         yield return new WaitForSeconds(regrowDelay);
