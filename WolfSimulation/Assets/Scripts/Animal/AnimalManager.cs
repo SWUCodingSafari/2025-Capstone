@@ -36,6 +36,7 @@ public class AnimalManager<T> : Singleton<AnimalManager<T>> where T : Animal
             foreach (var animal in otherPack)
             {
                 thisPack.Add(animal);
+                animal.PackNumber = _this.PackNumber;
                 animal.Mat.color = _this.Mat.color;
             }
 
@@ -125,7 +126,7 @@ public class AnimalManager<T> : Singleton<AnimalManager<T>> where T : Animal
         {
             T p = pack[i];
 
-            if (p.IsDied &&
+            if (p.IsDied == false &&
                 p.LookingForMate == true &&
                 p.CheckIfThisCanMate() == true)
                 return p;

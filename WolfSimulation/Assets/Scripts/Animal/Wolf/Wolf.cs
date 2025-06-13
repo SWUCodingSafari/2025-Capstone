@@ -120,6 +120,7 @@ public class Wolf : Animal
 
         // 섭취
         stateFactors[(int)WolfState.Eat] = (isThereDeadDeer ? 1f : 0f) * hungerRatio * BaseStatus.eatAdder;
+        
 
         // 추격
         stateFactors[(int)WolfState.Chase] = (isThereDeer ? 1f : 0f) * staminaRatio * (BaseStatus as WolfStatus).chaseAdder;
@@ -137,11 +138,11 @@ public class Wolf : Animal
 
         // 번식
         bool canMate = CheckIfThisCanMate();
-        if (lookingForMate != canMate && canMate == true)
+        if (LookingForMate != canMate && canMate == true)
         {
             Mate();
         }
-        lookingForMate = canMate;
+        LookingForMate = canMate;
 
         // 회복
         bool enoughHunger = hungerRatio >= 0.5f;
@@ -249,6 +250,9 @@ public class Wolf : Animal
 
     protected override void SelectStateAndBehave(int _newState = -1)
     {
+        if (IsDied == true)
+            return;
+
         var newState = _newState >= 0 ? (WolfState)_newState : ChangeState();
 
         // 이미 그 행동을 진행 중
@@ -275,7 +279,7 @@ public class Wolf : Animal
         return state == _checkState;
     }
 
-    public override void Mate(Animal _mateAnimal = null)
+    public override void Mate(Animal _mateAnimal = null, bool isRequested = false)
     {
         if (_mateAnimal == null) // 이제 짝 찾기
         {
@@ -291,12 +295,18 @@ public class Wolf : Animal
             return;
         }
 
-        mate.Mate(this);
+        if (isRequested == false)
+        {
+            mate.Mate(this);
+        }
         SelectStateAndBehave((int)WolfState.Mate);
     }
 
     public override void MateOver(Animal _mateAnimal = null)
     {
+        if (IsMating == false)
+            return;
+
         IsMating = false;
         BaseStatus.urgeToMate -= BaseStatus.subUrgeToMateAfterMate;
 
@@ -306,7 +316,7 @@ public class Wolf : Animal
             GiveBirth(mate);
         }
 
-        OnEnviromentChanged();
+        SelectStateAndBehave((int)DeerState.Idle);
     }
 
     public override bool CheckIfThisCanMate()

@@ -83,7 +83,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 20
   maxHealth: 20
-  reduceHealthBySec: 0.5
+  reduceHealthBySec: 0.1
   addHealthByHealingSec: 2
   hunger: 10
   maxHunger: 10
@@ -112,7 +112,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  addHungerBySec: 0.5
+  addHungerBySec: 0.3
   stamina: 25
   maxStamina: 25
   subStaminaByWalkSec: 0.3
@@ -127,13 +127,14 @@ MonoBehaviour:
   subUrgeToMateAfterMate: 6
   mateTime: 2
   addUrgeToMateBySec: 0.3
-  viewDist: 5
+  viewDist: 10
   moveSpeed: 4
   runSpeed: 5
   maxTurnAngleBySec: 45
-  maxClusterDistance: 3
-  minClusterDistance: 1.5
+  maxClusterDistance: 5
+  minClusterDistance: 3
   loosePackTime: 5
+  independence: 0.5
   hungerToRestAdder: 3
   eatAdder: 7
   searchAdder: 4
