@@ -68,7 +68,7 @@ public class AnimalStatus :MonoBehaviour
 
     public virtual AnimalStatus GetNewStatus(AnimalStatus _that)
     {
-        // todo: ���� �˰���
+        // todo: 이곳에 작성하기
         AnimalStatus newStatus = new AnimalStatus();
         newStatus = this;
         return newStatus;
