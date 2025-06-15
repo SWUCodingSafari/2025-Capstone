@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.IO.LowLevel.Unsafe;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -45,10 +46,15 @@ public abstract class Animal : MonoBehaviour
     public bool LookingForMate
     {
         get => lookingForMate;
-        set => lookingForMate = value;
+        set
+        {
+            //Debug.Log($"{id} is {(value ? "" : "not ")}looking for match");
+            lookingForMate = value;
+        }
     }
     public bool IsMating { get; set; }
     protected Animal mate = null;
+    public Animal MatePair { get => mate; }
 
     // 公府 包府侩
     public int PackNumber { get; set; } = -1;
@@ -67,6 +73,7 @@ public abstract class Animal : MonoBehaviour
         BaseStatus.hunger = 0f;
         BaseStatus.urgeToMate = 0f;
         BaseStatus.fear = 0f;
+        BaseStatus.urgeToMate = BaseStatus.maxUrgeToMate - BaseStatus.subUrgeToMateAfterMate;
 
         (sight as SphereCollider).radius = BaseStatus.viewDist;
         mat = rend?.material;

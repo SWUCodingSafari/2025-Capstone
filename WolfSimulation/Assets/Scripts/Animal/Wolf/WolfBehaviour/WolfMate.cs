@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public class WolfMate : AnimalStateBehaviour
@@ -13,13 +14,17 @@ public class WolfMate : AnimalStateBehaviour
 
         elapsedTime = 0f;
 
-        animal.anim.SetBool(WolfAnimation.IsMating, true);
+        Vector3 mateDir = animal.MatePair.transform.position - animal.transform.position;
+        animal.TurnToDesiredDir(mateDir);
+        
+        animal.anim.SetBool(WolfAnimation.IsWalking, true);
     }
 
     public override void OnExit()
     {
         animal.IsMating = false;
         animal.anim.SetBool(WolfAnimation.IsMating, false);
+        animal.anim.SetBool(WolfAnimation.IsWalking, false);
     }
 
     public override float ReducedStamina()
@@ -29,13 +34,32 @@ public class WolfMate : AnimalStateBehaviour
 
     public override bool Update()
     {
-        elapsedTime += Time.deltaTime;
-        if (elapsedTime > animal.BaseStatus.mateTime)
-        {
-            animal.MateOver();
+        Vector3 vec = animal.MatePair.transform.position - animal.transform.position;
+        vec.y = 0f;
 
-            return true;
+        animal.TurnToDesiredDir(vec.normalized);
+
+        if(vec.sqrMagnitude <= 1f)
+        {
+            if(elapsedTime <= 0f)
+            {
+                animal.anim.SetBool(WolfAnimation.IsMating, true);
+                animal.anim.SetBool(WolfAnimation.IsWalking, false);
+            }
+
+            elapsedTime += Time.deltaTime;
+
+            if (elapsedTime > animal.BaseStatus.mateTime)
+            {
+                animal.MateOver();
+
+                return true;
+            }
+
+            return false;
         }
+
+        animal.MovePosition();
 
         return false;
     }

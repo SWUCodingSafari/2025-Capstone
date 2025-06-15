@@ -19,6 +19,10 @@ public class WolfHealing : AnimalStateBehaviour
         animal.BaseStatus.health =
             Mathf.Clamp(animal.BaseStatus.health + animal.BaseStatus.addHealthByHealingSec * Time.deltaTime,
             0f, animal.BaseStatus.maxHealth);
+
+        animal.BaseStatus.hunger =
+            Mathf.Clamp(animal.BaseStatus.hunger - animal.BaseStatus.addHungerByheallingSec * Time.deltaTime,
+            0f, animal.BaseStatus.maxHunger);
         return true;
     }
 }

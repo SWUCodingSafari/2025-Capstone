@@ -105,11 +105,11 @@ public class Wolf : Animal
         float healthRatio = BaseStatus.health / BaseStatus.maxHealth;
 
         float hungerAdder = hungerRatio * BaseStatus.eatAdder;
-        
-        //if(CheckState(WolfState.Chase) == true || isThereDeer)
-        //{
-        //    return WolfState.Chase;
-        //}
+
+        if (CheckState(WolfState.Mate) == true)
+        {
+            return WolfState.Mate;
+        }
 
         // ∆—≈Õ √ ±‚»≠
         for (int i = 0; i < (int)WolfState.MAX; ++i)
@@ -125,13 +125,16 @@ public class Wolf : Animal
         // º∑√Î
         stateFactors[(int)WolfState.Eat] = (isThereDeadDeer ? 1f : 0f) * hungerAdder;
         
+        bool noWolfNearby = WolfList.Count == 0;
+        bool isWolfMating = WolfList.Any(_ => _.IsMating == true);
+        bool packHungry = WolfList.Count == 0 || WolfList.Average(w => w.BaseStatus.hunger) / BaseStatus.maxHunger < 0.7f;
 
         // √ﬂ∞›
-        stateFactors[(int)WolfState.Chase] = (isThereDeer && isThereDeadDeer == false ? 1f : 0f) * hungerAdder * (BaseStatus as WolfStatus).chaseAdder;
+        stateFactors[(int)WolfState.Chase] = (isThereDeer && isThereDeadDeer == false && 
+            packHungry && isWolfMating == false ? 1f : 0f) 
+            * hungerAdder * (BaseStatus as WolfStatus).chaseAdder;
 
         // ¡§¬˚ (π´∏Æ πË∞Ì«ƒ ∆Ú±’)
-        bool noWolfNearby = WolfList.Count == 0;
-        bool packHungry = WolfList.Count == 0 || WolfList.Average(w => w.BaseStatus.hunger) / BaseStatus.maxHunger < 0.7f;
         stateFactors[(int)WolfState.Search] = (noWolfNearby || packHungry ? 1f : 0f) * hungerRatio * BaseStatus.searchAdder;
 
         // ¿Ãµø (π´∏ÆøÕ ∞≈∏Æ ¡∂¡§)
@@ -149,8 +152,9 @@ public class Wolf : Animal
         LookingForMate = canMate;
 
         // »∏∫π
-        bool enoughHunger = hungerRatio >= 0.5f;
-        stateFactors[(int)WolfState.Healing] = (BaseStatus.maxHealth - BaseStatus.health) / BaseStatus.maxHealth *
+        bool enoughHunger = hungerRatio <= 0.5f;
+        stateFactors[(int)WolfState.Healing] =  (enoughHunger ? 1 : 0) * 
+            (BaseStatus.maxHealth - BaseStatus.health) / BaseStatus.maxHealth *
             BaseStatus.heallingAdder;
 
         // ¡§¡ˆ (»ﬁΩƒ æ∆¥‘. ±◊≥… µ¸»˜ æ» ±æ¡÷∑»∞Ì µµ∏¡ æ» ∞°µµ µ )
@@ -317,6 +321,9 @@ public class Wolf : Animal
 
     public override void Mate(Animal _mateAnimal = null, bool isRequested = false)
     {
+        if (IsMating == true)
+            return;
+
         if (_mateAnimal == null) // ¿Ã¡¶ ¬¶ √£±‚
         {
             mate = AnimalManager<Wolf>.Instance.WantMate(this);
@@ -331,8 +338,10 @@ public class Wolf : Animal
             return;
         }
 
+        LookingForMate = false;
         if (isRequested == false)
         {
+            Debug.Log($"{id} and {mate.id} is match!");
             mate.Mate(this, true);
         }
         SelectStateAndBehave((int)WolfState.Mate);
@@ -358,20 +367,22 @@ public class Wolf : Animal
     public override bool CheckIfThisCanMate()
     {
         bool isHealthy = BaseStatus.health >= BaseStatus.maxHealth * 0.5f;
-        bool isFull = BaseStatus.hunger / BaseStatus.maxHunger >= 0.5f;
+        bool isFull = true;//BaseStatus.hunger / BaseStatus.maxHunger <= 0.5f;
         bool hasGroup = PackNumber >= 0;
         bool urgeIsEnough = BaseStatus.urgeToMate >= BaseStatus.maxUrgeToMate;
         bool isChasing = CheckState(WolfState.Chase);
         bool isEating = CheckState(WolfState.Eat);
+        bool isMating = IsMating ? true : CheckState(WolfState.Mate);
 
         return isHealthy && isFull && hasGroup && urgeIsEnough 
-            && (isChasing == false) && (isEating == false);
+            && (isChasing == false) && (isEating == false ) && (isMating == false);
     }
 
     protected override void GiveBirth(Animal _other)
     {
         Wolf baby = Instantiate(this);
-        baby.BaseStatus = BaseStatus.GetNewStatus(_other.BaseStatus);
+        baby.BaseStatus = BaseStatus.GetNewStatus(_other.BaseStatus, baby.BaseStatus);
+        baby.transform.position = (this.transform.position + _other.transform.position) / 2f;
     }
 
     public void Attack(Deer _target)
@@ -413,7 +424,7 @@ public class Wolf : Animal
             return;
         }
 
-        if (DeerList.Count <= 0)
+        if (WolfList.Count <= 0)
         {
             // ¡÷∫Øø° π´∏Æ∞° ∫∏¿Ã¡ˆ æ ¿Ω
             BaseStatus.coLoosePack = StartCoroutine(CoLoosePack<Wolf>());

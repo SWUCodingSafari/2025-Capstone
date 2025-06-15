@@ -137,7 +137,7 @@ public class Deer : Animal
 
         // 번식 팩터
         bool canMate = CheckIfThisCanMate();
-        if (LookingForMate != canMate && canMate == true)
+        if (LookingForMate != canMate && canMate == true )
         {
             // 지금 번식 가능해짐
             Mate();
@@ -389,7 +389,7 @@ public class Deer : Animal
     protected override void GiveBirth(Animal _other)
     {
         Deer baby = Instantiate(this);
-        baby.BaseStatus = BaseStatus.GetNewStatus(_other.BaseStatus);
+        baby.BaseStatus = BaseStatus.GetNewStatus(_other.BaseStatus, baby.BaseStatus);
     }
 
     public override void GetDamaged(float _value)

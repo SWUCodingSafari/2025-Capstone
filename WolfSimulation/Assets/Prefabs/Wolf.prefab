@@ -49,7 +49,7 @@ Rigidbody:
   m_GameObject: {fileID: 2420803830891764594}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
+  m_Drag: 5
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -135,7 +135,7 @@ MonoBehaviour:
   addHealthByHealingSec: 2
   hunger: 10
   maxHunger: 10
-  subHungerWhenEat: 5
+  subHungerWhenEat: 2
   hungerCurve:
     serializedVersion: 2
     m_Curve:
@@ -161,6 +161,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   addHungerBySec: 3
+  addHungerByheallingSec: 1
   stamina: 20
   maxStamina: 20
   subStaminaByWalkSec: 0.3
@@ -172,17 +173,17 @@ MonoBehaviour:
   subfearBySec: 1
   urgeToMate: 3
   maxUrgeToMate: 3
-  subUrgeToMateAfterMate: 6
+  subUrgeToMateAfterMate: 30
   mateTime: 2
   addUrgeToMateBySec: 0.3
-  viewDist: 5
+  maxClusterDistance: 5
+  minClusterDistance: 3
+  loosePackTime: 5
+  viewDist: 10
   moveSpeed: 10
   runSpeed: 15
   maxRunSpeed: 20
   maxTurnAngleBySec: 360
-  maxClusterDistance: 3
-  minClusterDistance: 1.5
-  loosePackTime: 5
   independence: 0.5
   hungerToRestAdder: 3
   eatAdder: 7
@@ -192,13 +193,11 @@ MonoBehaviour:
   moveAdder: 0.5
   hysteresisAdder: 1
   damage: 4
-  attackRange: 4
+  attackRange: 2
   attackCoolTime: 3
   slowAfterAttack: 0.3
   chaseAdder: 1
   attackAdder: 2
-  rank: 5
-  maxRank: 10
 --- !u!114 &8967349001824857749
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -19,6 +19,7 @@ public class AnimalStatus :MonoBehaviour
     [SerializeField] public float subHungerWhenEat = 3f;
     [SerializeField] public AnimationCurve hungerCurve;
     [SerializeField] public float addHungerBySec = 0.5f; // 
+    [SerializeField] public float addHungerByheallingSec = 1f;
 
     [Header("Stamina")]
     [SerializeField] public float stamina = 10f;
@@ -67,11 +68,12 @@ public class AnimalStatus :MonoBehaviour
     [SerializeField] public float moveAdder = 7f; //
     [SerializeField] public float hysteresisAdder = 2f; //
 
-    public virtual AnimalStatus GetNewStatus(AnimalStatus _that)
+    public virtual AnimalStatus GetNewStatus(AnimalStatus _that, AnimalStatus _baby)
     {
-        // todo: 이곳에 작성하기
-        AnimalStatus newStatus = new AnimalStatus();
-        newStatus = this;
-        return newStatus;
+        _baby = this;
+
+        // 여기에 작성
+
+        return _baby;
     }
 }

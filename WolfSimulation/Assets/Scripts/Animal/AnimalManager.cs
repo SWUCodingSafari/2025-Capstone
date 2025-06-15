@@ -128,6 +128,7 @@ public class AnimalManager<T> : Singleton<AnimalManager<T>> where T : Animal
 
             if (p.IsDied == false &&
                 p.LookingForMate == true &&
+                p.IsMating == false &&
                 p.CheckIfThisCanMate() == true)
                 return p;
         }
