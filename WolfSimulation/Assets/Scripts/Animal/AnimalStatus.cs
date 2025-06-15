@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
@@ -70,9 +71,9 @@ public class AnimalStatus : MonoBehaviour
     [SerializeField] public float hysteresisAdder = 2f; //
 
     [Header("GA")]
-    [SerializeField] public float settingOffset = 0.3f;
-    [SerializeField] public float mutationRate = 0.05f;
-    [SerializeField] public float mutationValue = 0.05f;
+    [SerializeField] static public float settingOffset = 0.3f;
+    [SerializeField] static public float mutationRate = 0.05f;
+    [SerializeField] static public float mutationValue = 0.05f;
 
     public DNAFactors dna;
 
@@ -151,28 +152,39 @@ public class AnimalStatus : MonoBehaviour
             float attackAdder = 0f
             )
         {
-            this.factors = new float[(int)Factors.MAX];
+            this.factors = new float[(int)Factors.WolfMAX];
 
-            this.factors[(int)Factors.addHungerBySec ] = addHungerBySec;
-            this.factors[(int)Factors.subfearBySec ] = subfearBySec;
-            this.factors[(int)Factors.subUrgeToMateAfterMate ] = subUrgeToMateAfterMate;
-            this.factors[(int)Factors.viewDist ] = viewDist;
-            this.factors[(int)Factors.moveSpeed ] = moveSpeed;
-            this.factors[(int)Factors.runSpeed ] = runSpeed;
-            this.factors[(int)Factors.maxRunSpeed ] = maxRunSpeed;
-            this.factors[(int)Factors.maxTurnAngleBySec ] = maxTurnAngleBySec;
-            this.factors[(int)Factors.independence ] = independence;
-            this.factors[(int)Factors.hungerToRestAdder ] = hungerToRestAdder;
-            this.factors[(int)Factors.eatAdder ] = eatAdder;
-            this.factors[(int)Factors.searchAdder ] = searchAdder;
-            this.factors[(int)Factors.heallingAdder ] = heallingAdder;
-            this.factors[(int)Factors.mateAdder ] = mateAdder;
-            this.factors[(int)Factors.moveAdder ] = moveAdder;
+            this.factors[(int)Factors.addHungerBySec] = addHungerBySec;
+            this.factors[(int)Factors.subfearBySec] = subfearBySec;
+            this.factors[(int)Factors.subUrgeToMateAfterMate] = subUrgeToMateAfterMate;
+            this.factors[(int)Factors.viewDist] = viewDist;
+            this.factors[(int)Factors.moveSpeed] = moveSpeed;
+            this.factors[(int)Factors.runSpeed] = runSpeed;
+            this.factors[(int)Factors.maxRunSpeed] = maxRunSpeed;
+            this.factors[(int)Factors.maxTurnAngleBySec] = maxTurnAngleBySec;
+            this.factors[(int)Factors.independence] = independence;
+            this.factors[(int)Factors.hungerToRestAdder] = hungerToRestAdder;
+            this.factors[(int)Factors.eatAdder] = eatAdder;
+            this.factors[(int)Factors.searchAdder] = searchAdder;
+            this.factors[(int)Factors.heallingAdder] = heallingAdder;
+            this.factors[(int)Factors.mateAdder] = mateAdder;
+            this.factors[(int)Factors.moveAdder] = moveAdder;
             this.factors[(int)Factors.hysteresisAdder] = hysteresisAdder;
 
             this.factors[(int)Factors.attackRange] = attackRange;
             this.factors[(int)Factors.chaseAdder] = chaseAdder;
             this.factors[(int)Factors.attackAdder] = attackAdder;
+        }
+
+        public override string ToString()
+        {
+            string txt = "";
+            foreach (var f in factors)
+            {
+                txt += string.Format("{0,10:F3} | ", f);
+            }
+
+            return txt;
         }
     }
 
@@ -200,31 +212,143 @@ public class AnimalStatus : MonoBehaviour
         // RandomGeneration();
     }
 
-    // 랜덤 유전자 생성
-    public virtual void RandomGeneration()
+    public virtual void SetStatus(AnimalStatus status)
     {
-        int max = (int)DNAFactors.Factors.MAX;
-        float[] factors = new float[max];
+        this.health = status.health;
+        this.maxHealth = status.maxHealth;
+        this.reduceHealthBySec = status.reduceHealthBySec;
+        this.addHealthByHealingSec = status.addHealthByHealingSec;
+
+        this.hunger = status.hunger;
+        this.maxHunger = status.maxHunger;
+        this.subHungerWhenEat = status.subHungerWhenEat;
+        this.hungerCurve = status.hungerCurve;
+
+        this.addHungerBySec = status.addHungerBySec;
+        this.addHungerByheallingSec = status.addHungerByheallingSec;
+
+        this.stamina = status.stamina;
+        this.maxStamina = status.maxStamina;
+        this.subStaminaByWalkSec = status.subStaminaByWalkSec;
+        this.subStaminaByRunSec = status.subStaminaByRunSec;
+        this.subStaminaByMateSec = status.subStaminaByMateSec;
+        this.addStaminaBySec = status.addStaminaBySec;
+
+        this.fear = status.fear;
+        this.maxFear = status.maxFear;
+        this.subfearBySec = status.subfearBySec;
+
+        this.urgeToMate = status.urgeToMate;
+        this.maxUrgeToMate = status.maxUrgeToMate;
+        this.subUrgeToMateAfterMate = status.subUrgeToMateAfterMate;
+        this.mateTime = status.mateTime;
+        this.addUrgeToMateBySec = status.addUrgeToMateBySec;
+
+        this.maxClusterDistance = status.maxClusterDistance;
+        this.minClusterDistance = status.minClusterDistance;
+
+        this.loosePackTime = status.loosePackTime;
+
+        this.viewDist = status.viewDist;
+        this.moveSpeed = status.moveSpeed;
+        this.runSpeed = status.runSpeed;
+        this.maxRunSpeed = status.maxRunSpeed;
+        this.maxTurnAngleBySec = status.maxTurnAngleBySec;
+
+        this.independence = status.independence;
+
+        this.hungerToRestAdder = status.hungerToRestAdder;
+        this.eatAdder = status.eatAdder;
+        this.searchAdder = status.searchAdder;
+        this.heallingAdder = status.heallingAdder;
+        this.mateAdder = status.mateAdder;
+        this.moveAdder = status.moveAdder;
+        this.hysteresisAdder = status.hysteresisAdder; this.health = status.health;
+        this.maxHealth = status.maxHealth;
+        this.reduceHealthBySec = status.reduceHealthBySec;
+        this.addHealthByHealingSec = status.addHealthByHealingSec;
+
+        this.hunger = status.hunger;
+        this.maxHunger = status.maxHunger;
+        this.subHungerWhenEat = status.subHungerWhenEat;
+        this.hungerCurve = status.hungerCurve;
+
+        this.addHungerBySec = status.addHungerBySec;
+        this.addHungerByheallingSec = status.addHungerByheallingSec;
+
+        this.stamina = status.stamina;
+        this.maxStamina = status.maxStamina;
+        this.subStaminaByWalkSec = status.subStaminaByWalkSec;
+        this.subStaminaByRunSec = status.subStaminaByRunSec;
+        this.subStaminaByMateSec = status.subStaminaByMateSec;
+        this.addStaminaBySec = status.addStaminaBySec;
+
+        this.fear = status.fear;
+        this.maxFear = status.maxFear;
+        this.subfearBySec = status.subfearBySec;
+
+        this.urgeToMate = status.urgeToMate;
+        this.maxUrgeToMate = status.maxUrgeToMate;
+        this.subUrgeToMateAfterMate = status.subUrgeToMateAfterMate;
+        this.mateTime = status.mateTime;
+        this.addUrgeToMateBySec = status.addUrgeToMateBySec;
+
+        this.maxClusterDistance = status.maxClusterDistance;
+        this.minClusterDistance = status.minClusterDistance;
+
+        this.loosePackTime = status.loosePackTime;
+
+        this.viewDist = status.viewDist;
+        this.moveSpeed = status.moveSpeed;
+        this.runSpeed = status.runSpeed;
+        this.maxRunSpeed = status.maxRunSpeed;
+        this.maxTurnAngleBySec = status.maxTurnAngleBySec;
+
+        this.independence = status.independence;
+
+        this.hungerToRestAdder = status.hungerToRestAdder;
+        this.eatAdder = status.eatAdder;
+        this.searchAdder = status.searchAdder;
+        this.heallingAdder = status.heallingAdder;
+        this.mateAdder = status.mateAdder;
+        this.moveAdder = status.moveAdder;
+        this.hysteresisAdder = status.hysteresisAdder;
+    }
+
+    // 랜덤 유전자 생성
+    public static DNAFactors RandomGeneration(DNAFactors factors)
+    {
+        int max = (int)DNAFactors.Factors.WolfMAX;
+        float[] newfactors = new float[max];
 
         for (int i = 0; i < max; ++i)
         {
-            factors[i] = UnityEngine.Random.Range(
-                dna.factors[i] * (1 - settingOffset),
-                dna.factors[i] * (1 + settingOffset)
+            newfactors[i] = UnityEngine.Random.Range(
+                factors.factors[i] * (1 - settingOffset),
+                factors.factors[i] * (1 + settingOffset)
                 );
         }
+
+        return new DNAFactors(newfactors);
     }
 
-    public AnimalStatus GetNewStatus(AnimalStatus _that, AnimalStatus _baby)
+    public AnimalStatus GetNewStatus(AnimalStatus _this, AnimalStatus _that, AnimalStatus _baby)
     {
-        _baby = this;
+        _baby.SetStatus(_this);
 
-        _baby.dna = GetParentHalf(this, _that);
+        _baby.dna = GetParentHalf(_this.dna, _that.dna);
 
         return _baby;
     }
 
-    public virtual DNAFactors GetParentHalf(AnimalStatus _a, AnimalStatus _b)
+    public AnimalStatus GetNewStatus(AnimalStatus _baseStatus, DNAFactors _a, DNAFactors _b, AnimalStatus _baby)
+    {
+        _baby.SetStatus(_baseStatus);
+        _baby.dna = GetParentHalf(_a, _b);
+        return _baby;
+    }
+
+    public virtual DNAFactors GetParentHalf(DNAFactors _a, DNAFactors _b)
     {
         int max = (int)DNAFactors.Factors.MAX;
         float[] factors = new float[max];
@@ -232,7 +356,7 @@ public class AnimalStatus : MonoBehaviour
         for (int i = 0; i < max; ++i)
         {
             bool isMutate = (float)UnityEngine.Random.Range(0, 100) / 100 < mutationRate;
-            if(isMutate)
+            if (isMutate)
             {
                 factors[i] = GetMutationValue(factors[i]);
                 continue;
@@ -240,8 +364,8 @@ public class AnimalStatus : MonoBehaviour
 
             int randomNum = UnityEngine.Random.Range(0, 10);
 
-            if(randomNum < 5) factors[i] = _a.dna.factors[i];
-            else factors[i] = _b.dna.factors[i];
+            if (randomNum < 5) factors[i] = _a.factors[i];
+            else factors[i] = _b.factors[i];
         }
 
         return new DNAFactors(factors);

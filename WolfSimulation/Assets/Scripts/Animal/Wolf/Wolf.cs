@@ -65,7 +65,7 @@ public class Wolf : Animal
     private AnimalStateBehaviour[] stateBehaviours =
         new AnimalStateBehaviour[(int)WolfState.MAX];
 
-    protected override void Init()
+    public override void Init()
     {
         base.Init();
 
@@ -88,7 +88,7 @@ public class Wolf : Animal
 
     private WolfState ChangeState()
     {
-        if (BaseStatus.health <= 0 && BaseStatus.hunger <= 0)
+        if (BaseStatus.health <= 0 && BaseStatus.hunger >= BaseStatus.maxHunger)
         {
             return WolfState.Die;
         }
@@ -274,6 +274,11 @@ public class Wolf : Animal
 
         if(CheckState(WolfState.MAX) == false )
             stateBehaviours[(int)state].OnBehaviourCycle();
+
+        if (BaseStatus.health <= 0 && BaseStatus.hunger >= BaseStatus.maxHunger)
+        {
+            SelectStateAndBehave((int)WolfState.Die);
+        }
     }
 
     public override void OnEnviromentChanged()
@@ -301,7 +306,7 @@ public class Wolf : Animal
             return;
         }
 
-        Debug.Log($"Current State: {state}, Change State: {newState}, id: {id}");
+        //Debug.Log($"Current State: {state}, Change State: {newState}, id: {id}");
         state = newState;
         stateChanged?.Invoke();
         stateReset = null;
@@ -380,7 +385,7 @@ public class Wolf : Animal
     protected override void GiveBirth(Animal _other)
     {
         Wolf baby = Instantiate(this);
-        baby.BaseStatus = BaseStatus.GetNewStatus(_other.BaseStatus, baby.BaseStatus);
+        baby.BaseStatus = BaseStatus.GetNewStatus( this.BaseStatus, _other.BaseStatus, baby.BaseStatus);
         baby.transform.position = (this.transform.position + _other.transform.position) / 2f;
     }
 
