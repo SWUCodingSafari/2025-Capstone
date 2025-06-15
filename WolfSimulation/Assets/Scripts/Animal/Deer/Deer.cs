@@ -209,6 +209,20 @@ public class Deer : Animal
                 return 0;
         });
 
+        // 사슴 정렬
+        i= 0;
+        while (i < DeerList.Count)
+        {
+            if (DeerList[i] == null)
+            {
+                DeerList.Remove(DeerList[i]);
+            }
+            else
+            {
+                ++i;
+            }
+        }
+
         // 사슴 정렬 (가까운 순)
         DeerList.Sort((a, b) =>
         {
@@ -223,6 +237,20 @@ public class Deer : Animal
             return 0;
         });
 
+        // 사슴 정렬
+        i = 0;
+        while (i < DeerList.Count)
+        {
+            if (DeerList[i] == null)
+            {
+                DeerList.Remove(DeerList[i]);
+            }
+            else
+            {
+                ++i;
+            }
+        }
+
         // 늑대 정렬 (가까운 순)
         WolfList.Sort((a, b) =>
         {
@@ -231,8 +259,10 @@ public class Deer : Animal
             {
                 return 1;
             }
-            else
+            else if ((a.transform.position - transform.position).sqrMagnitude >
+            (b.transform.position - transform.position).sqrMagnitude)
                 return -1;
+            return 0;
         });
 
     }
@@ -286,7 +316,7 @@ public class Deer : Animal
             return;
         }
 
-        Debug.Log($"Current State: {state}, Change State: {newState}, id: {id}");
+        //Debug.Log($"Current State: {state}, Change State: {newState}, id: {id}");
         state = newState;
         stateChanged?.Invoke();
         stateReset = null;
@@ -365,12 +395,15 @@ public class Deer : Animal
     public override void GetDamaged(float _value)
     {
         BaseStatus.health = Mathf.Clamp(BaseStatus.health - _value, 0, BaseStatus.maxHealth);
+        Debug.Log($"Get Hurt {BaseStatus.health} ");
         OnEnviromentChanged();
     }
 
     public bool GetEaten()
     {
-        meat = Mathf.Clamp(meat - 1, 0, 10);
+        meat = Mathf.Clamp(meat - 1, 0, meat);
+        Debug.Log($"Get Hurt {meat} ");
+
         if (meat <= 0)
         {
             Destroy(gameObject);

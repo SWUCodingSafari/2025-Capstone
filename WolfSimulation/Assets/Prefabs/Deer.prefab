@@ -68,6 +68,7 @@ MonoBehaviour:
   - 0
   - 0
   - 0
+  beingChased: 0
   meat: 10
 --- !u!114 &6349542649922981449
 MonoBehaviour:
@@ -130,6 +131,7 @@ MonoBehaviour:
   viewDist: 10
   moveSpeed: 4
   runSpeed: 5
+  maxRunSpeed: 7
   maxTurnAngleBySec: 45
   maxClusterDistance: 5
   minClusterDistance: 3
@@ -140,7 +142,7 @@ MonoBehaviour:
   searchAdder: 4
   heallingAdder: 5
   mateAdder: 3
-  moveAdder: 2
+  moveAdder: 1
   hysteresisAdder: 2
 --- !u!54 &4795173001578239592
 Rigidbody:

@@ -13,4 +13,9 @@ public class WolfStatus : AnimalStatus
     [Header("AttackAdder")]
     [SerializeField] public float chaseAdder = 3f;
     [SerializeField] public float attackAdder = 2f;
+
+    [Header("Herd")]
+    [SerializeField] public float rank = 5;
+    [SerializeField] public float maxRank = 10;
+
 }

@@ -15,8 +15,12 @@ public class WolfSearch : AnimalStateBehaviour
     }
     private SearchType searchType = SearchType.None;
 
-    private float searchTime = 8f;
     private float elapsedTime = 0f;
+    private float searchTime = 4f;
+    private float thinkTime = 0.5f;
+
+    private bool isThinking = false;
+
 
     public override void OnEnter()
     {
@@ -26,6 +30,17 @@ public class WolfSearch : AnimalStateBehaviour
     }
 
     public override void OnReset()
+    {
+        if (searchDir != Vector3.zero)
+            return;
+
+        elapsedTime = 0f;
+        isThinking = false;
+
+        SetDir();
+    }
+
+    private void SetDir()
     {
         int deerCount = animal.DeerList.Count;
         int wolfCount = animal.WolfList.Count;
@@ -38,9 +53,13 @@ public class WolfSearch : AnimalStateBehaviour
         else if (wolfCount > 0 && deerCount == 0) // 무리는 있는데 먹이 없음
         {
             searchType = SearchType.SearchDeer;
-            FollowPack();
+            int n = Random.Range(0, 10);
+            if (n / 10f <= animal.BaseStatus.independence)
+                FollowPack();
+            else
+                SearchRandom();
         }
-        else // deerCount == 0 && grassCount == 0 >> 무리도 먹이도 없음
+        else // wolfCount == 0 && deerCount == 0 >> 무리도 먹이도 없음
         {
             searchType = SearchType.SearchBoth;
             SearchRandom();
@@ -57,15 +76,26 @@ public class WolfSearch : AnimalStateBehaviour
 
     public override bool Update()
     {
-        if (searchType == SearchType.SearchBoth)
+        elapsedTime += Time.deltaTime;
+        if (isThinking == true)
         {
-            elapsedTime += Time.deltaTime;
-            if (elapsedTime >= searchTime)
+            if(elapsedTime >= thinkTime)
             {
-                // todo: 자연스럽게 하기 위해서 조금 멈췄다가 다시 이동하는 걸로 해야함
-                elapsedTime -= searchTime;
-                PickSearchDir();
+                animal.anim.SetBool(DeerAnimation.IsWalking, true);
+                elapsedTime = 0f;
+                isThinking = false;
             }
+            return false;
+        }
+
+        if (elapsedTime >= searchTime)
+        { 
+            animal.anim.SetBool(DeerAnimation.IsWalking, false);
+
+            isThinking = true;
+            elapsedTime = 0f;
+            SetDir();
+            return false;
         }
 
         // 종료 조건 없음, 만약 풀이나 사슴을 찾았다면,
@@ -127,7 +157,8 @@ public class WolfSearch : AnimalStateBehaviour
         do
         {
             newDir = (byte)((Random.Range(0, 4) << 2) + Random.Range(0, 4));
-        } while (((newDir == currentSearchWay) && (~newDir == currentSearchWay)));
+        } while ((((newDir & currentSearchWay) == currentSearchWay) && 
+        ((~newDir & currentSearchWay) == currentSearchWay)));
 
         currentSearchWay = newDir;
 
@@ -150,5 +181,7 @@ public class WolfSearch : AnimalStateBehaviour
         {
             searchDir += animal.transform.right;
         }
+
+        searchDir = searchDir.normalized;
     }
 }

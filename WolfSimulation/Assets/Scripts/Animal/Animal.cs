@@ -112,6 +112,8 @@ public abstract class Animal : MonoBehaviour
             BaseStatus.health = Mathf.Clamp(BaseStatus.health - BaseStatus.reduceHealthBySec * Time.deltaTime, 0f, BaseStatus.maxHealth);
         }
     }
+
+
     public abstract void GetDamaged(float _value);
 
     #region LookOutEnviroment
@@ -142,7 +144,7 @@ public abstract class Animal : MonoBehaviour
         Grass grass;
         if (IsThereComponent<Grass>(other, out grass) == true)
         {
-            if (grass.reservedBy != null)
+            if (grass.reservedBy != null )
                 return;
 
             GrassList.Add(grass);
@@ -153,7 +155,8 @@ public abstract class Animal : MonoBehaviour
         Deer deer;
         if(IsThereComponent<Deer>(other, out deer) == true)
         {
-            if(deer as Animal == this)
+            if(deer as Animal == this ||
+                DeerList.Any( _ => _ == deer))
             {
                 // 자기자신 검출 추가 안함
                 return;
@@ -167,7 +170,8 @@ public abstract class Animal : MonoBehaviour
         Wolf wolf;
         if (IsThereComponent<Wolf>(other, out wolf) == true)
         {
-            if (wolf as Animal == this)
+            if (wolf as Animal == this ||
+                WolfList.Any( _ => _ == deer))
             {
                 // 자기자신 검출 추가 안함
                 return;
@@ -234,12 +238,15 @@ public abstract class Animal : MonoBehaviour
 
     }
 
+    #region Mate
     public virtual bool CheckIfThisCanMate()
     {
         return false;
     }
     public virtual void Mate(Animal _mateAnimal = null, bool isRequested = false) { }
     public virtual void MateOver(Animal _mateAnimal = null) { }
+    protected abstract void GiveBirth(Animal _other);
+    #endregion
 
     public void MovePosition(float _moveSpeed = -1f)
     {
@@ -260,5 +267,4 @@ public abstract class Animal : MonoBehaviour
         Destroy(gameObject, 5f);
     }
 
-    protected abstract void GiveBirth(Animal _other);
 }

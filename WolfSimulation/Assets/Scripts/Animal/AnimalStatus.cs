@@ -44,6 +44,7 @@ public class AnimalStatus :MonoBehaviour
     [SerializeField] public float viewDist = 5f;
     [SerializeField] public float moveSpeed = 1f;
     [SerializeField] public float runSpeed = 2f;
+    [SerializeField] public float maxRunSpeed = 7f;
     [SerializeField] public float maxTurnAngleBySec = 15f;
 
     [Header("Boid")]

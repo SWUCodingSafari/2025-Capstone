@@ -7,7 +7,7 @@ public class WolfEat : AnimalStateBehaviour
     private Deer targetDeer = null;
 
     private float elapsedTime = 0f;
-    private float eatTime = 0.471f;
+    private float eatTime = 1f;
     private bool isSearching = true;
 
     public override void OnEnter()
@@ -22,7 +22,7 @@ public class WolfEat : AnimalStateBehaviour
         if (targetDeer != null)
             return;
 
-        targetDeer = animal.DeerList.Find(_ => _.IsDied );
+        targetDeer = animal.DeerList.Find(_ => _.IsDied == true);
         if (targetDeer == null)
         {
             animal.OnEnviromentChanged();
@@ -30,18 +30,14 @@ public class WolfEat : AnimalStateBehaviour
         }
 
         elapsedTime = 0f;
-        eatTime = -1f;
         isSearching = true;
     }
 
     public override void OnExit()
     {
-        Debug.Log("Eat Exit");
-        if (targetDeer == null)
-            return;
-
         targetDeer = null;
 
+        animal.anim.SetBool(DeerAnimation.IsEating, false);
         animal.anim.SetBool(DeerAnimation.IsWalking, false);
     }
 
@@ -53,7 +49,7 @@ public class WolfEat : AnimalStateBehaviour
         Vector3 subVec = targetDeer.transform.position - animal.transform.position;
         subVec.y = 0f;
         
-        if (subVec.sqrMagnitude <= 1f)
+        if (subVec.sqrMagnitude <= 3f)
         {
             if (isSearching == true)
             {
@@ -67,11 +63,13 @@ public class WolfEat : AnimalStateBehaviour
             elapsedTime += Time.deltaTime;
             if (elapsedTime < eatTime) return false;
 
-            animal.anim.SetBool(DeerAnimation.IsEating, false);
+            elapsedTime -= eatTime;
 
-            animal.DeerList.Remove(targetDeer);
-            targetDeer.GetEaten();
-            targetDeer = null;
+            if(targetDeer.GetEaten() == false)
+            {
+                animal.DeerList.Remove(targetDeer);
+                targetDeer = null;
+            }
             animal.BaseStatus.hunger = Mathf.Clamp(
                 animal.BaseStatus.hunger - animal.BaseStatus.subHungerWhenEat, 0, animal.BaseStatus.maxHunger);
             return true;

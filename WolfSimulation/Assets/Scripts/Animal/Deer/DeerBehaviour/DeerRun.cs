@@ -88,7 +88,7 @@ public class DeerRun : AnimalStateBehaviour
 
         // 각 요소에 가중치를 곱해서 합산
         float weightSeparation = 0.7f;
-        float weightAlignment = 1.0f;
+        float weightAlignment = 1.5f;
         float weightCohesion = 1.0f;
         float weightRunAway = 2.0f;
 
@@ -116,8 +116,8 @@ public class DeerRun : AnimalStateBehaviour
         SetDirection();
 
         float runSpeed = (animal.BaseStatus.stamina / animal.BaseStatus.maxStamina) *
-            (animal.BaseStatus.runSpeed - animal.BaseStatus.moveSpeed) +
-            animal.BaseStatus.moveSpeed;
+            (animal.BaseStatus.maxRunSpeed - animal.BaseStatus.runSpeed) +
+            animal.BaseStatus.runSpeed;
 
         animal.TurnToDesiredDir(diraction);
         animal.MovePosition(runSpeed);

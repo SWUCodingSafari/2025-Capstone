@@ -41,7 +41,7 @@ public class DeerSearch : AnimalStateBehaviour
         {
             searchType = SearchType.SearchGrass;
             int n = Random.Range(0, 10);
-            if(n / 10 <= animal.BaseStatus.independence)
+            if(n / 10f <= animal.BaseStatus.independence)
                 FollowPack();
             else
                 SearchRandom();

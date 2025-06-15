@@ -94,20 +94,6 @@ public class Wolf : Animal
             return WolfState.Die;
         }
 
-        if (CheckState(WolfState.Chase) == true)
-            return WolfState.Chase;
-
-        // 팩터 초기화
-        for (int i = 0; i < (int)WolfState.MAX; ++i)
-        {
-            stateFactors[i] = -1f;
-        }
-
-        // 휴식
-        stateFactors[(int)DeerState.Idle] =
-            CheckState(WolfState.Eat) ? 0f : BaseStatus.maxStamina - BaseStatus.stamina -
-            BaseStatus.hungerCurve.Evaluate(BaseStatus.hunger / BaseStatus.maxHunger);
-
         // 주변에 사슴이 있는가?
         bool isThereDeer = DeerList.Any();
         bool isThereDeadDeer = DeerList.Any(_ => _.IsDied == true);
@@ -118,12 +104,30 @@ public class Wolf : Animal
         float staminaRatio = BaseStatus.stamina / BaseStatus.maxStamina;
         float healthRatio = BaseStatus.health / BaseStatus.maxHealth;
 
+        float hungerAdder = hungerRatio * BaseStatus.eatAdder;
+        
+        //if(CheckState(WolfState.Chase) == true || isThereDeer)
+        //{
+        //    return WolfState.Chase;
+        //}
+
+        // 팩터 초기화
+        for (int i = 0; i < (int)WolfState.MAX; ++i)
+        {
+            stateFactors[i] = -1f;
+        }
+
+        // 휴식
+        stateFactors[(int)WolfState.Idle] =
+            CheckState(WolfState.Eat) ? 0f : BaseStatus.maxStamina - BaseStatus.stamina -
+            BaseStatus.hungerCurve.Evaluate(BaseStatus.hunger / BaseStatus.maxHunger);
+
         // 섭취
-        stateFactors[(int)WolfState.Eat] = (isThereDeadDeer ? 1f : 0f) * hungerRatio * BaseStatus.eatAdder;
+        stateFactors[(int)WolfState.Eat] = (isThereDeadDeer ? 1f : 0f) * hungerAdder;
         
 
         // 추격
-        stateFactors[(int)WolfState.Chase] = (isThereDeer ? 1f : 0f) * staminaRatio * (BaseStatus as WolfStatus).chaseAdder;
+        stateFactors[(int)WolfState.Chase] = (isThereDeer && isThereDeadDeer == false ? 1f : 0f) * hungerAdder * (BaseStatus as WolfStatus).chaseAdder;
 
         // 정찰 (무리 배고픔 평균)
         bool noWolfNearby = WolfList.Count == 0;
@@ -131,7 +135,7 @@ public class Wolf : Animal
         stateFactors[(int)WolfState.Search] = (noWolfNearby || packHungry ? 1f : 0f) * hungerRatio * BaseStatus.searchAdder;
 
         // 이동 (무리와 거리 조정)
-        bool isMoving = Random.Range(0, 10) < 8;
+        bool isMoving = Random.Range(0, 10) < 7;
         float distToNearestWolf = WolfList.Count > 0 ? (WolfList[0].transform.position - transform.position).magnitude : -1f;
         stateFactors[(int)WolfState.Move] = (isMoving == false || (CheckState(WolfState.Eat) || distToNearestWolf < 0f) ? 0f :
             Mathf.Abs(distToNearestWolf - BaseStatus.maxClusterDistance) * BaseStatus.moveAdder);
@@ -155,7 +159,7 @@ public class Wolf : Animal
             BaseStatus.maxStamina - BaseStatus.stamina - BaseStatus.hungerCurve.Evaluate(hungerRatio) : 0f;
 
 
-        if ((int)state < (int)WolfState.MAX)
+        if ((int)state < (int)WolfState.MAX && CheckState(WolfState.Eat) == false)
             stateFactors[(int)state] += BaseStatus.hysteresisAdder;
 
         return (WolfState)GetTopFactor();
@@ -180,6 +184,20 @@ public class Wolf : Animal
 
     public override void UpdateEnviroment()
     {
+        // 사슴 정렬
+        int i = 0;
+        while (i < DeerList.Count)
+        {
+            if (DeerList[i] == null)
+            {
+                DeerList.Remove(DeerList[i]);
+            }
+            else
+            {
+                ++i;
+            }
+        }
+
         // 사슴 정렬 (가까운 순)
         DeerList.Sort((a, b) =>
         {
@@ -208,6 +226,20 @@ public class Wolf : Animal
 
         });
 
+        // 늑대 정렬
+        i = 0;
+        while (i < WolfList.Count)
+        {
+            if (WolfList[i] == null)
+            {
+                WolfList.Remove(WolfList[i]);
+            }
+            else
+            {
+                ++i;
+            }
+        }
+
         // 늑대 정렬 (가까운 순)
         WolfList.Sort((a, b) =>
         {
@@ -216,8 +248,10 @@ public class Wolf : Animal
             {
                 return 1;
             }
-            else
+            else if ((a.transform.position - transform.position).sqrMagnitude >
+            (b.transform.position - transform.position).sqrMagnitude)
                 return -1;
+            return 0;
         });
 
     }
@@ -231,7 +265,6 @@ public class Wolf : Animal
     {
         base.BehaviourCycle();
 
-
         float subBySec = CheckState(WolfState.MAX) ? BaseStatus.subStaminaByWalkSec :
             stateBehaviours[(int)state].ReducedStamina();
         BaseStatus.stamina = Mathf.Clamp(BaseStatus.stamina - subBySec * Time.deltaTime, 0f, BaseStatus.maxStamina);
@@ -242,6 +275,9 @@ public class Wolf : Animal
 
     public override void OnEnviromentChanged()
     {
+        if (IsDied == true)
+            return;
+
         // 환경 조건 정리
         UpdateEnviroment();
 
@@ -297,7 +333,7 @@ public class Wolf : Animal
 
         if (isRequested == false)
         {
-            mate.Mate(this);
+            mate.Mate(this, true);
         }
         SelectStateAndBehave((int)WolfState.Mate);
     }
@@ -325,8 +361,11 @@ public class Wolf : Animal
         bool isFull = BaseStatus.hunger / BaseStatus.maxHunger >= 0.5f;
         bool hasGroup = PackNumber >= 0;
         bool urgeIsEnough = BaseStatus.urgeToMate >= BaseStatus.maxUrgeToMate;
+        bool isChasing = CheckState(WolfState.Chase);
+        bool isEating = CheckState(WolfState.Eat);
 
-        return isHealthy && isFull && hasGroup && urgeIsEnough;
+        return isHealthy && isFull && hasGroup && urgeIsEnough 
+            && (isChasing == false) && (isEating == false);
     }
 
     protected override void GiveBirth(Animal _other)

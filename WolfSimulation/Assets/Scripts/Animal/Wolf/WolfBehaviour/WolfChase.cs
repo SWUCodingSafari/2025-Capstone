@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class WolfChase : AnimalStateBehaviour
@@ -8,6 +9,7 @@ public class WolfChase : AnimalStateBehaviour
 
     private Deer targetDeer = null;
     private float elapsedTime = 0f;
+    private bool canAttack = true;
 
     public override void OnEnter()
     {
@@ -15,6 +17,8 @@ public class WolfChase : AnimalStateBehaviour
 
         status = animal.BaseStatus as WolfStatus;
         targetDeer = SetTarget();
+
+        canAttack = true;
     }
 
     public override void OnExit()
@@ -29,12 +33,16 @@ public class WolfChase : AnimalStateBehaviour
         Vector3 subVec = targetDeer.transform.position - animal.transform.position;
         subVec.y = 0;
 
-        elapsedTime += Time.deltaTime;
-        bool canAttack = elapsedTime >= status.attackCoolTime;
+        if(canAttack == false)
+        {
+            elapsedTime += Time.deltaTime;
+
+            canAttack = elapsedTime >= status.attackCoolTime;
+        }
         
         if (subVec.sqrMagnitude <=  Mathf.Pow(status.attackRange, 2f))
         {
-            if(canAttack)
+            if (canAttack)
             {
                 elapsedTime -= status.attackCoolTime;
                 animal.anim.SetTrigger(WolfAnimation.Attack);
@@ -44,13 +52,15 @@ public class WolfChase : AnimalStateBehaviour
                 {
                     return true;
                 }
+
+                canAttack = false;
+                return false;
             }
         }
 
-        float runSpeed = (status.stamina / status.maxStamina) *
-            (status.runSpeed - status.moveSpeed) +
-            status.moveSpeed *
-            (canAttack ? 1f : status.slowAfterAttack);
+        float runSpeed = ((status.stamina / status.maxStamina) *
+            (status.maxRunSpeed - status.runSpeed) +
+            status.runSpeed) * (1f - status.slowAfterAttack) * (elapsedTime / status.attackCoolTime) + status.slowAfterAttack;
 
         animal.TurnToDesiredDir(subVec.normalized);
         animal.MovePosition(runSpeed);

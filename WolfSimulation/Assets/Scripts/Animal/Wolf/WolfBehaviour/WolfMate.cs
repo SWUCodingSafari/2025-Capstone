@@ -13,13 +13,13 @@ public class WolfMate : AnimalStateBehaviour
 
         elapsedTime = 0f;
 
-        animal.anim.SetBool(DeerAnimation.IsMating, true);
+        animal.anim.SetBool(WolfAnimation.IsMating, true);
     }
 
     public override void OnExit()
     {
         animal.IsMating = false;
-        animal.anim.SetBool(DeerAnimation.IsMating, false);
+        animal.anim.SetBool(WolfAnimation.IsMating, false);
     }
 
     public override float ReducedStamina()
