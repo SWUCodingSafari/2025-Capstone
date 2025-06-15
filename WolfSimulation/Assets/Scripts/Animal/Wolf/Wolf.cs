@@ -60,7 +60,6 @@ public class Wolf : Animal
 
     [Header("State")]
     [SerializeField] private WolfState state;
-    public WolfState State { get => state; private set => state = value; }
 
     [SerializeField] private float[] stateFactors = new float[(int)WolfState.MAX];
     private AnimalStateBehaviour[] stateBehaviours =
@@ -144,12 +143,12 @@ public class Wolf : Animal
             Mathf.Abs(distToNearestWolf - BaseStatus.maxClusterDistance) * BaseStatus.moveAdder);
 
         // 번식
-        bool canMate = CheckIfThisCanMate();
-        if (LookingForMate != canMate && canMate == true)
-        {
-            Mate();
-        }
-        LookingForMate = canMate;
+        //bool canMate = CheckIfThisCanMate();
+        //if (LookingForMate != canMate && canMate == true)
+        //{
+        //    Mate();
+        //}
+        //LookingForMate = canMate;
 
         // 회복
         bool enoughHunger = hungerRatio <= 0.5f;

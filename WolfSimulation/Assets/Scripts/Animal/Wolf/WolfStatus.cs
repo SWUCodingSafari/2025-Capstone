@@ -13,4 +13,75 @@ public class WolfStatus : AnimalStatus
     [Header("AttackAdder")]
     [SerializeField] public float chaseAdder = 3f; //
     [SerializeField] public float attackAdder = 2f; //
+
+
+    public override void Awake()
+    {
+        dna = new DNAFactors(
+            addHungerBySec,
+            subfearBySec,
+            subUrgeToMateAfterMate,
+            viewDist,
+            moveSpeed,
+            runSpeed,
+            maxRunSpeed,
+            maxTurnAngleBySec,
+            independence,
+            hungerToRestAdder,
+            eatAdder,
+            searchAdder,
+            heallingAdder,
+            mateAdder,
+            moveAdder,
+
+            attackRange,
+            chaseAdder,
+            attackAdder
+            );
+
+        RandomGeneration();
+    }
+
+    public override void RandomGeneration()
+    {
+        base.RandomGeneration();
+
+        int max = (int)DNAFactors.Factors.WolfMAX;
+        float[] factors = new float[max];
+
+        for (int i = 0; i < max; ++i)
+        {
+            factors[i] = UnityEngine.Random.Range(
+                dna.factors[i] * (1 - settingOffset),
+                dna.factors[i] * (1 + settingOffset)
+                );
+        }
+    }
+
+    public override DNAFactors GetParentHalf(AnimalStatus _a, AnimalStatus _b)
+    {
+        int max = (int)DNAFactors.Factors.WolfMAX;
+        float[] factors = new float[max];
+
+        for (int i = 0; i < max; ++i)
+        {
+            bool isMutate = (float)UnityEngine.Random.Range(0, 100) / 100 < mutationRate;
+            if (isMutate)
+            {
+                factors[i] = GetMutationValue(factors[i]);
+                continue;
+            }
+
+            int randomNum = UnityEngine.Random.Range(0, 10);
+
+            if (randomNum < 5) factors[i] = _a.dna.factors[i];
+            else factors[i] = _b.dna.factors[i];
+        }
+
+        return new DNAFactors(factors);
+    }
+
+    /// 1. 렌덤 초기값 => 10 마리?
+    /// 2. 세대당 시뮬레이션 결과 값 필요 >> dna, 생존 시간 (늑대만)
+    ///         >> 
 }

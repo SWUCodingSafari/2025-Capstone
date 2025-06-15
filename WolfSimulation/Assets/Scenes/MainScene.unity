@@ -1358,7 +1358,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &62790057
 Transform:
   m_ObjectHideFlags: 0
@@ -6118,7 +6118,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4523954044011121088, guid: 63027905339f4244f97af6a2cd0254c9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -17.800001
+      value: -21.25
       objectReference: {fileID: 0}
     - target: {fileID: 4523954044011121088, guid: 63027905339f4244f97af6a2cd0254c9, type: 3}
       propertyPath: m_LocalPosition.y
@@ -6126,7 +6126,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4523954044011121088, guid: 63027905339f4244f97af6a2cd0254c9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 7.7999997
+      value: 3.74
       objectReference: {fileID: 0}
     - target: {fileID: 4523954044011121088, guid: 63027905339f4244f97af6a2cd0254c9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -14933,10 +14933,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Wolf (3)
       objectReference: {fileID: 0}
-    - target: {fileID: 2420803830891764594, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4523954044011121088, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.29999924
@@ -22710,7 +22706,7 @@ Transform:
   m_GameObject: {fileID: 822279605}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 15.200001, y: 0, z: -7.1}
+  m_LocalPosition: {x: 3.11, y: 0, z: -6.54}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -31633,7 +31629,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1195329808
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34784,10 +34780,6 @@ PrefabInstance:
     - target: {fileID: 2420803830891764594, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
       propertyPath: m_Name
       value: Wolf (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 4042556227741163680, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
-      propertyPath: reduceHealthBySec
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4523954044011121088, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
       propertyPath: m_LocalPosition.x
@@ -46955,14 +46947,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Wolf (2)
       objectReference: {fileID: 0}
-    - target: {fileID: 2420803830891764594, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4042556227741163680, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
-      propertyPath: reduceHealthBySec
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4523954044011121088, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2.8999996
@@ -52860,10 +52844,6 @@ PrefabInstance:
     - target: {fileID: 2420803830891764594, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
       propertyPath: m_Name
       value: Wolf (4)
-      objectReference: {fileID: 0}
-    - target: {fileID: 2420803830891764594, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4523954044011121088, guid: 189f78dacc0b6db4bb2693fb3008c512, type: 3}
       propertyPath: m_LocalPosition.x

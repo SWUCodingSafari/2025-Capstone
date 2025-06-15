@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [Serializable]
-public class AnimalStatus :MonoBehaviour
+public class AnimalStatus : MonoBehaviour
 {
     [Header("Point")]
     [Header("Health")]
@@ -24,7 +25,7 @@ public class AnimalStatus :MonoBehaviour
     [Header("Stamina")]
     [SerializeField] public float stamina = 10f;
     [SerializeField] public float maxStamina = 10f;
-    [SerializeField] public float subStaminaByWalkSec = 0.5f; 
+    [SerializeField] public float subStaminaByWalkSec = 0.5f;
     [SerializeField] public float subStaminaByRunSec = 1f;
     [SerializeField] public float subStaminaByMateSec = 0.8f;
     [SerializeField] public float addStaminaBySec = 1.5f;
@@ -68,61 +69,189 @@ public class AnimalStatus :MonoBehaviour
     [SerializeField] public float moveAdder = 7f; //
     [SerializeField] public float hysteresisAdder = 2f; //
 
-    // 염색체 (유전 형질의 집합)
-    public virtual void DNA(float addHungerBySec, float subfearBySec, float subUrgeToMateAfterMate,
-        float viewDist, float moveSpeed, float runSpeed, float maxRunSpeed, float maxTurnAngleBySec,
-        float independence, float hungerToRestAdder, float eatAdder, float searchAdder, float heallingAdder,
-        float mateAdder, float moveAdder, float hysteresisAdder)
+    [Header("GA")]
+    [SerializeField] public float settingOffset = 0.3f;
+    [SerializeField] public float mutationRate = 0.05f;
+    [SerializeField] public float mutationValue = 0.05f;
+
+    public DNAFactors dna;
+
+    public struct DNAFactors
     {
-        this.addHungerBySec = addHungerBySec;
-        this.subfearBySec = subfearBySec;
-        this.subUrgeToMateAfterMate = subUrgeToMateAfterMate;
-        this.viewDist = viewDist;
-        this.moveSpeed = moveSpeed;
-        this.runSpeed = runSpeed;
-        this.maxRunSpeed = maxRunSpeed;
-        this.maxTurnAngleBySec = maxTurnAngleBySec;
-        this.independence = independence;
-        this.hungerToRestAdder = hungerToRestAdder;
-        this.eatAdder = eatAdder;
-        this.searchAdder = searchAdder;
-        this.heallingAdder = heallingAdder;
-        this.mateAdder = mateAdder;
-        this.moveAdder = moveAdder;
-        this.hysteresisAdder = hysteresisAdder;
+        public enum Factors
+        {
+            addHungerBySec,
+            subfearBySec,
+            subUrgeToMateAfterMate,
+            viewDist,
+            moveSpeed,
+            runSpeed,
+            maxRunSpeed,
+            maxTurnAngleBySec,
+            independence,
+            hungerToRestAdder,
+            eatAdder,
+            searchAdder,
+            heallingAdder,
+            mateAdder,
+            moveAdder,
+            hysteresisAdder,
+            MAX,
+
+            attackRange = MAX,
+            chaseAdder,
+            attackAdder,
+            WolfMAX
+        }
+
+        public float[] factors;
+
+        //public float addHungerBySec;
+        //public float subfearBySec;
+        //public float subUrgeToMateAfterMate;
+        //public float viewDist;
+        //public float moveSpeed;
+        //public float runSpeed;
+        //public float maxRunSpeed;
+        //public float maxTurnAngleBySec;
+        //public float independence;
+        //public float hungerToRestAdder;
+        //public float eatAdder;
+        //public float searchAdder;
+        //public float heallingAdder;
+        //public float mateAdder;
+        //public float moveAdder;
+        //public float hysteresisAdder;
+
+        public DNAFactors(float[] factors)
+        {
+            this.factors = factors;
+        }
+
+        public DNAFactors(
+            float addHungerBySec,
+            float subfearBySec,
+            float subUrgeToMateAfterMate,
+            float viewDist,
+            float moveSpeed,
+            float runSpeed,
+            float maxRunSpeed,
+            float maxTurnAngleBySec,
+            float independence,
+            float hungerToRestAdder,
+            float eatAdder,
+            float searchAdder,
+            float heallingAdder,
+            float mateAdder,
+            float moveAdder,
+            float hysteresisAdder,
+
+            float attackRange = 0f,
+            float chaseAdder = 0f,
+            float attackAdder = 0f
+            )
+        {
+            this.factors = new float[(int)Factors.MAX];
+
+            this.factors[(int)Factors.addHungerBySec ] = addHungerBySec;
+            this.factors[(int)Factors.subfearBySec ] = subfearBySec;
+            this.factors[(int)Factors.subUrgeToMateAfterMate ] = subUrgeToMateAfterMate;
+            this.factors[(int)Factors.viewDist ] = viewDist;
+            this.factors[(int)Factors.moveSpeed ] = moveSpeed;
+            this.factors[(int)Factors.runSpeed ] = runSpeed;
+            this.factors[(int)Factors.maxRunSpeed ] = maxRunSpeed;
+            this.factors[(int)Factors.maxTurnAngleBySec ] = maxTurnAngleBySec;
+            this.factors[(int)Factors.independence ] = independence;
+            this.factors[(int)Factors.hungerToRestAdder ] = hungerToRestAdder;
+            this.factors[(int)Factors.eatAdder ] = eatAdder;
+            this.factors[(int)Factors.searchAdder ] = searchAdder;
+            this.factors[(int)Factors.heallingAdder ] = heallingAdder;
+            this.factors[(int)Factors.mateAdder ] = mateAdder;
+            this.factors[(int)Factors.moveAdder ] = moveAdder;
+            this.factors[(int)Factors.hysteresisAdder] = hysteresisAdder;
+
+            this.factors[(int)Factors.attackRange] = attackRange;
+            this.factors[(int)Factors.chaseAdder] = chaseAdder;
+            this.factors[(int)Factors.attackAdder] = attackAdder;
+        }
     }
 
+    public virtual void Awake()
+    {
+        dna = new DNAFactors(
+            addHungerBySec,
+            subfearBySec,
+            subUrgeToMateAfterMate,
+            viewDist,
+            moveSpeed,
+            runSpeed,
+            maxRunSpeed,
+            maxTurnAngleBySec,
+            independence,
+            hungerToRestAdder,
+            eatAdder,
+            searchAdder,
+            heallingAdder,
+            mateAdder,
+            moveAdder,
+            hysteresisAdder
+            );
 
+        // RandomGeneration();
+    }
 
     // 랜덤 유전자 생성
-    /*public virtual AnimalStatus RandomGeneration()
+    public virtual void RandomGeneration()
     {
-        return new AnimalStatus( // 수정 필요
-            addHungerBySec = UnityEngine.Random.Range(0.2f, 1.0f),
-            subfearBySec = UnityEngine.Random.Range(0.5f, 2.0f),
-            subUrgeToMateAfterMate = UnityEngine.Random.Range(3f, 8f),
-            viewDist = UnityEngine.Random.Range(3f, 10f),
-            moveSpeed = UnityEngine.Random.Range(1f, 4f),
-            runSpeed = UnityEngine.Random.Range(2f, 5f),
-            maxRunSpeed = UnityEngine.Random.Range(5f, 10f),
-            maxTurnAngleBySec = UnityEngine.Random.Range(10f, 45f),
-            independence = UnityEngine.Random.Range(0.1f, 1.0f),
-            hungerToRestAdder = UnityEngine.Random.Range(1f, 5f),
-            eatAdder = UnityEngine.Random.Range(1f, 5f),
-            searchAdder = UnityEngine.Random.Range(3f, 8f),
-            heallingAdder = UnityEngine.Random.Range(3f, 8f),
-            mateAdder = UnityEngine.Random.Range(1f, 5f),
-            moveAdder = UnityEngine.Random.Range(5f, 10f),
-            hysteresisAdder = UnityEngine.Random.Range(1f, 4f)
-        );
-    }*/
+        int max = (int)DNAFactors.Factors.MAX;
+        float[] factors = new float[max];
 
-    public virtual AnimalStatus GetNewStatus(AnimalStatus _that, AnimalStatus _baby)
+        for (int i = 0; i < max; ++i)
+        {
+            factors[i] = UnityEngine.Random.Range(
+                dna.factors[i] * (1 - settingOffset),
+                dna.factors[i] * (1 + settingOffset)
+                );
+        }
+    }
+
+    public AnimalStatus GetNewStatus(AnimalStatus _that, AnimalStatus _baby)
     {
         _baby = this;
 
-        // 여기에 작성
+        _baby.dna = GetParentHalf(this, _that);
 
         return _baby;
+    }
+
+    public virtual DNAFactors GetParentHalf(AnimalStatus _a, AnimalStatus _b)
+    {
+        int max = (int)DNAFactors.Factors.MAX;
+        float[] factors = new float[max];
+
+        for (int i = 0; i < max; ++i)
+        {
+            bool isMutate = (float)UnityEngine.Random.Range(0, 100) / 100 < mutationRate;
+            if(isMutate)
+            {
+                factors[i] = GetMutationValue(factors[i]);
+                continue;
+            }
+
+            int randomNum = UnityEngine.Random.Range(0, 10);
+
+            if(randomNum < 5) factors[i] = _a.dna.factors[i];
+            else factors[i] = _b.dna.factors[i];
+        }
+
+        return new DNAFactors(factors);
+    }
+
+    protected float GetMutationValue(float _value)
+    {
+        return UnityEngine.Random.Range(
+                _value * (1 - mutationValue),
+                _value * (1 + mutationValue)
+                );
     }
 }

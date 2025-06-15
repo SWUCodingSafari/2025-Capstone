@@ -389,7 +389,7 @@ public class Deer : Animal
     protected override void GiveBirth(Animal _other)
     {
         Deer baby = Instantiate(this);
-        baby.BaseStatus = BaseStatus.GetNewStatus(_other.BaseStatus, baby.BaseStatus);
+        baby.BaseStatus = this.BaseStatus;
     }
 
     public override void GetDamaged(float _value)
