@@ -68,6 +68,55 @@ public class AnimalStatus :MonoBehaviour
     [SerializeField] public float moveAdder = 7f; //
     [SerializeField] public float hysteresisAdder = 2f; //
 
+    // 염색체 (유전 형질의 집합)
+    public virtual void DNA(float addHungerBySec, float subfearBySec, float subUrgeToMateAfterMate,
+        float viewDist, float moveSpeed, float runSpeed, float maxRunSpeed, float maxTurnAngleBySec,
+        float independence, float hungerToRestAdder, float eatAdder, float searchAdder, float heallingAdder,
+        float mateAdder, float moveAdder, float hysteresisAdder)
+    {
+        this.addHungerBySec = addHungerBySec;
+        this.subfearBySec = subfearBySec;
+        this.subUrgeToMateAfterMate = subUrgeToMateAfterMate;
+        this.viewDist = viewDist;
+        this.moveSpeed = moveSpeed;
+        this.runSpeed = runSpeed;
+        this.maxRunSpeed = maxRunSpeed;
+        this.maxTurnAngleBySec = maxTurnAngleBySec;
+        this.independence = independence;
+        this.hungerToRestAdder = hungerToRestAdder;
+        this.eatAdder = eatAdder;
+        this.searchAdder = searchAdder;
+        this.heallingAdder = heallingAdder;
+        this.mateAdder = mateAdder;
+        this.moveAdder = moveAdder;
+        this.hysteresisAdder = hysteresisAdder;
+    }
+
+
+
+    // 랜덤 유전자 생성
+    /*public virtual AnimalStatus RandomGeneration()
+    {
+        return new AnimalStatus( // 수정 필요
+            addHungerBySec = UnityEngine.Random.Range(0.2f, 1.0f),
+            subfearBySec = UnityEngine.Random.Range(0.5f, 2.0f),
+            subUrgeToMateAfterMate = UnityEngine.Random.Range(3f, 8f),
+            viewDist = UnityEngine.Random.Range(3f, 10f),
+            moveSpeed = UnityEngine.Random.Range(1f, 4f),
+            runSpeed = UnityEngine.Random.Range(2f, 5f),
+            maxRunSpeed = UnityEngine.Random.Range(5f, 10f),
+            maxTurnAngleBySec = UnityEngine.Random.Range(10f, 45f),
+            independence = UnityEngine.Random.Range(0.1f, 1.0f),
+            hungerToRestAdder = UnityEngine.Random.Range(1f, 5f),
+            eatAdder = UnityEngine.Random.Range(1f, 5f),
+            searchAdder = UnityEngine.Random.Range(3f, 8f),
+            heallingAdder = UnityEngine.Random.Range(3f, 8f),
+            mateAdder = UnityEngine.Random.Range(1f, 5f),
+            moveAdder = UnityEngine.Random.Range(5f, 10f),
+            hysteresisAdder = UnityEngine.Random.Range(1f, 4f)
+        );
+    }*/
+
     public virtual AnimalStatus GetNewStatus(AnimalStatus _that, AnimalStatus _baby)
     {
         _baby = this;
