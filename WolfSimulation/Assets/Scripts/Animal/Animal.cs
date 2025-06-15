@@ -61,14 +61,20 @@ public abstract class Animal : MonoBehaviour
 
     public int id;
 
-    public virtual void Awake()
+    // GA
+    private float livingTime = 0f;
+    public float LivingTime { get => livingTime; }
+
+    public virtual void Start()
     {
         id = Random.Range(0, 1231);
         Init();
     }
 
-    protected virtual void Init()
+    public virtual void Init()
     {
+        livingTime = 0f;
+
         BaseStatus.health = BaseStatus.maxHealth;
         BaseStatus.hunger = 0f;
         BaseStatus.urgeToMate = 0f;
@@ -93,6 +99,8 @@ public abstract class Animal : MonoBehaviour
 
     public virtual void Update()
     {
+        livingTime += Time.deltaTime;
+
         if (IsDied == true)
             return;
 
@@ -274,4 +282,8 @@ public abstract class Animal : MonoBehaviour
         Destroy(gameObject, 5f);
     }
 
+    private void OnDestroy()
+    {
+        //GAManager.Instance.AnimalDied(this, livingTime);
+    }
 }

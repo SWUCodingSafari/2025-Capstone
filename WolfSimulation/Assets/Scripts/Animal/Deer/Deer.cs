@@ -68,7 +68,7 @@ public class Deer : Animal
     [SerializeField] private int beingChased = 0;
     [SerializeField] private int meat = 10;
 
-    protected override void Init()
+    public override void Init()
     {
         base.Init();
 
@@ -91,7 +91,7 @@ public class Deer : Animal
 
     private DeerState ChangeState()
     {
-        if(BaseStatus.health <= 0 && BaseStatus.hunger <= 0)
+        if(BaseStatus.health <= 0 && BaseStatus.hunger >= BaseStatus.maxHunger)
         {
             return DeerState.Die;
         }
@@ -285,7 +285,7 @@ public class Deer : Animal
         if(CheckState(DeerState.MAX) == false)
             stateBehaviours[(int)state].OnBehaviourCycle();
 
-        if(BaseStatus.health <= 0f)
+        if(BaseStatus.health <= 0f && BaseStatus.hunger >= BaseStatus.maxHunger)
         {
             SelectStateAndBehave((int)DeerState.Die);
         }
@@ -389,7 +389,7 @@ public class Deer : Animal
     protected override void GiveBirth(Animal _other)
     {
         Deer baby = Instantiate(this);
-        baby.BaseStatus = this.BaseStatus;
+        baby.BaseStatus.SetStatus(this.BaseStatus);
     }
 
     public override void GetDamaged(float _value)

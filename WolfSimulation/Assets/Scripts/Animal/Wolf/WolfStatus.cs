@@ -39,26 +39,27 @@ public class WolfStatus : AnimalStatus
             attackAdder
             );
 
-        RandomGeneration();
     }
 
-    public override void RandomGeneration()
+    public override void SetStatus(AnimalStatus status)
     {
-        base.RandomGeneration();
+        base.SetStatus(status);
 
-        int max = (int)DNAFactors.Factors.WolfMAX;
-        float[] factors = new float[max];
+        if (status is not WolfStatus)
+            return;
 
-        for (int i = 0; i < max; ++i)
-        {
-            factors[i] = UnityEngine.Random.Range(
-                dna.factors[i] * (1 - settingOffset),
-                dna.factors[i] * (1 + settingOffset)
-                );
-        }
+        WolfStatus wStatus = status as WolfStatus;
+
+        this.damage = wStatus.damage;
+        this.attackRange = wStatus.attackRange;
+        this.attackCoolTime = wStatus.attackCoolTime;
+        this.slowAfterAttack = wStatus.slowAfterAttack;
+        ;
+        this.chaseAdder = wStatus.chaseAdder;
+        this.attackAdder = wStatus.attackAdder;
     }
 
-    public override DNAFactors GetParentHalf(AnimalStatus _a, AnimalStatus _b)
+    public override DNAFactors GetParentHalf(DNAFactors _a, DNAFactors _b)
     {
         int max = (int)DNAFactors.Factors.WolfMAX;
         float[] factors = new float[max];
@@ -74,8 +75,8 @@ public class WolfStatus : AnimalStatus
 
             int randomNum = UnityEngine.Random.Range(0, 10);
 
-            if (randomNum < 5) factors[i] = _a.dna.factors[i];
-            else factors[i] = _b.dna.factors[i];
+            if (randomNum < 5) factors[i] = _a.factors[i];
+            else factors[i] = _b.factors[i];
         }
 
         return new DNAFactors(factors);
