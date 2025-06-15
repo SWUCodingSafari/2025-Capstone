@@ -18,12 +18,12 @@ public class AnimalStatus :MonoBehaviour
     [SerializeField] public float maxHunger = 10f;
     [SerializeField] public float subHungerWhenEat = 3f;
     [SerializeField] public AnimationCurve hungerCurve;
-    [SerializeField] public float addHungerBySec = 0.5f;
+    [SerializeField] public float addHungerBySec = 0.5f; // 
 
     [Header("Stamina")]
     [SerializeField] public float stamina = 10f;
     [SerializeField] public float maxStamina = 10f;
-    [SerializeField] public float subStaminaByWalkSec = 0.5f;
+    [SerializeField] public float subStaminaByWalkSec = 0.5f; 
     [SerializeField] public float subStaminaByRunSec = 1f;
     [SerializeField] public float subStaminaByMateSec = 0.8f;
     [SerializeField] public float addStaminaBySec = 1.5f;
@@ -31,21 +31,14 @@ public class AnimalStatus :MonoBehaviour
     [Header("Fear")]
     [SerializeField] public float fear = 0f;
     [SerializeField] public float maxFear = 10f;
-    [SerializeField] public float subfearBySec = 1f;
+    [SerializeField] public float subfearBySec = 1f; //
 
     [Header("Mate")]
     [SerializeField] public float urgeToMate = 3f;
     [SerializeField] public float maxUrgeToMate = 3f;
-    [SerializeField] public float subUrgeToMateAfterMate = 6f;
+    [SerializeField] public float subUrgeToMateAfterMate = 6f; //
     [SerializeField] public float mateTime = 2f;
     [SerializeField] public float addUrgeToMateBySec = 0.3f;
-
-    [Header("Basic State")]
-    [SerializeField] public float viewDist = 5f;
-    [SerializeField] public float moveSpeed = 1f;
-    [SerializeField] public float runSpeed = 2f;
-    [SerializeField] public float maxRunSpeed = 7f;
-    [SerializeField] public float maxTurnAngleBySec = 15f;
 
     [Header("Boid")]
     [SerializeField] public float maxClusterDistance = 3f;
@@ -55,17 +48,24 @@ public class AnimalStatus :MonoBehaviour
     public WaitForSeconds wfLoosePack;
     public Coroutine coLoosePack = null;
 
+    [Header("Basic State")]
+    [SerializeField] public float viewDist = 5f; //
+    [SerializeField] public float moveSpeed = 1f; //
+    [SerializeField] public float runSpeed = 2f; //
+    [SerializeField] public float maxRunSpeed = 7f; // 
+    [SerializeField] public float maxTurnAngleBySec = 15f; //
+
     [Header("Position")]
-    [SerializeField] public float independence = 0.5f;
+    [SerializeField] public float independence = 0.5f; //
 
     [Header("PointAdder")]
-    [SerializeField] public float hungerToRestAdder = 3f;
-    [SerializeField] public float eatAdder = 2f;
-    [SerializeField] public float searchAdder = 6f;
-    [SerializeField] public float heallingAdder = 5f;
-    [SerializeField] public float mateAdder = 3f;
-    [SerializeField] public float moveAdder = 7f;
-    [SerializeField] public float hysteresisAdder = 2f;
+    [SerializeField] public float hungerToRestAdder = 3f; //
+    [SerializeField] public float eatAdder = 2f; //
+    [SerializeField] public float searchAdder = 6f; //
+    [SerializeField] public float heallingAdder = 5f; //
+    [SerializeField] public float mateAdder = 3f; //
+    [SerializeField] public float moveAdder = 7f; //
+    [SerializeField] public float hysteresisAdder = 2f; //
 
     public virtual AnimalStatus GetNewStatus(AnimalStatus _that)
     {
