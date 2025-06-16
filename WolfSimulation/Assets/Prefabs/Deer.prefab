@@ -126,7 +126,7 @@ MonoBehaviour:
   subfearBySec: 3
   urgeToMate: 3
   maxUrgeToMate: 3
-  subUrgeToMateAfterMate: 6
+  subUrgeToMateAfterMate: 15
   mateTime: 2
   addUrgeToMateBySec: 0.3
   maxClusterDistance: 5
