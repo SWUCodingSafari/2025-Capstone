@@ -105,13 +105,15 @@ public class GAManager : SingletonBehaviour<GAManager>
         if (_animal is not Wolf)
             return;
 
+        Wolf wolf = _animal as Wolf;
+
         for(int i = 0; i < initialWolfCount; ++i)
         {
             if (_animal != wolfList[i])
                 continue;
 
             wolfStatusList[i].num = i;
-            wolfStatusList[i].dna = _animal.BaseStatus.dna;
+            wolfStatusList[i].dna = wolf.BaseStatus.dna;
             wolfStatusList[i].lifeTime = _lifeTime;
 
             secondWolfId = topWolfId;
