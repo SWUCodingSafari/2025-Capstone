@@ -259,7 +259,7 @@ MonoBehaviour:
   mateAdder: 3
   moveAdder: 0.5
   hysteresisAdder: 1
-  damage: 4
+  damage: 10
   attackRange: 2
   attackCoolTime: 3
   slowAfterAttack: 0.3
