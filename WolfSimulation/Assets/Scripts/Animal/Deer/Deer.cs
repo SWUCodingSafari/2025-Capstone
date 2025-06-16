@@ -117,7 +117,7 @@ public class Deer : Animal
         bool isThereGrassToEat = false;
         foreach (var grass in GrassList)
         {
-            if (grass.IsGrown == true && grass.reservedBy == null)
+            if (grass.reservedBy == this || (grass.IsGrown == true && grass.reservedBy == null))
             {
                 isThereGrassToEat = true;
                 break;

@@ -36,7 +36,7 @@ public class DeerEat : AnimalStateBehaviour
 
         foreach(var grass in animal.GrassList)
         {
-            if(grass.IsGrown == true && grass.reservedBy == null)
+            if(grass.reservedBy == animal || (grass.IsGrown == true && grass.reservedBy == null))
             {
                 TGrass = grass;
                 break;
