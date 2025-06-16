@@ -69,7 +69,7 @@ MonoBehaviour:
   - 0
   - 0
   beingChased: 0
-  meat: 50
+  meat: 20
 --- !u!114 &6349542649922981449
 MonoBehaviour:
   m_ObjectHideFlags: 0
