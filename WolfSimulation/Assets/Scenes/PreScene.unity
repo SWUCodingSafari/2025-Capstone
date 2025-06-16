@@ -198,7 +198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 20
   maxHealth: 20
-  reduceHealthBySec: 2
+  reduceHealthBySec: 0.1
   addHealthByHealingSec: 2
   hunger: 10
   maxHunger: 10
