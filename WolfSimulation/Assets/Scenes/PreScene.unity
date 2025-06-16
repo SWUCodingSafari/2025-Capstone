@@ -202,7 +202,7 @@ MonoBehaviour:
   addHealthByHealingSec: 2
   hunger: 10
   maxHunger: 30
-  subHungerWhenEat: 2
+  subHungerWhenEat: 7
   hungerCurve:
     serializedVersion: 2
     m_Curve:
@@ -261,7 +261,7 @@ MonoBehaviour:
   hysteresisAdder: 1
   damage: 10
   attackRange: 2
-  attackCoolTime: 3
+  attackCoolTime: 1
   slowAfterAttack: 0.3
   chaseAdder: 1
   attackAdder: 2

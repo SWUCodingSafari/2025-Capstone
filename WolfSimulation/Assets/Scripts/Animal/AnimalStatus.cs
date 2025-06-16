@@ -71,9 +71,9 @@ public class AnimalStatus : MonoBehaviour
     [SerializeField] public float hysteresisAdder = 2f; //
 
     [Header("GA")]
-    [SerializeField] static public float settingOffset = 0.3f;
-    [SerializeField] static public float mutationRate = 0.1f; // 기존 설정 값은 0.05f
-    [SerializeField] static public float mutationValue = 0.1f; // 기존 설정 값은 0.05f
+    [SerializeField] static public float settingOffset = 0.4f;
+    [SerializeField] static public float mutationRate = 0.2f; // 기존 설정 값은 0.05f
+    [SerializeField] static public float mutationValue = 0.2f; // 기존 설정 값은 0.05f
 
     public DNAFactors dna;
 
@@ -83,6 +83,7 @@ public class AnimalStatus : MonoBehaviour
         {
             maxHunger,
             addHungerBySec,
+            subHungerWhenEat,
             subfearBySec,
             subUrgeToMateAfterMate,
             viewDist,
@@ -134,6 +135,7 @@ public class AnimalStatus : MonoBehaviour
         public DNAFactors(
             float maxHunger,
             float addHungerBySec,
+            float subHungerWhenEat,
             float subfearBySec,
             float subUrgeToMateAfterMate,
             float viewDist,
@@ -159,6 +161,7 @@ public class AnimalStatus : MonoBehaviour
 
             this.factors[(int)Factors.maxHunger] = maxHunger;
             this.factors[(int)Factors.addHungerBySec] = addHungerBySec;
+            this.factors[(int)Factors.subHungerWhenEat] = subHungerWhenEat;
             this.factors[(int)Factors.subfearBySec] = subfearBySec;
             this.factors[(int)Factors.subUrgeToMateAfterMate] = subUrgeToMateAfterMate;
             this.factors[(int)Factors.viewDist] = viewDist;
@@ -197,6 +200,7 @@ public class AnimalStatus : MonoBehaviour
         dna = new DNAFactors(
             maxHunger,
             addHungerBySec,
+            subHungerWhenEat,
             subfearBySec,
             subUrgeToMateAfterMate,
             viewDist,

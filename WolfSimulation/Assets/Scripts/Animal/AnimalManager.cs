@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.VersionControl;
 using UnityEngine;
+using UnityEngine.Android;
 
 public class AnimalManager<T> : Singleton<AnimalManager<T>> where T : Animal
 {
@@ -117,6 +120,7 @@ public class AnimalManager<T> : Singleton<AnimalManager<T>> where T : Animal
         if (_this.PackNumber < 0 && packs[_this.PackNumber].Count <= 1)
             return null;
 
+        ResetList();
         List<T> pack = packs[_this.PackNumber];
         pack.Sort((a, b) => 
         (int) ((b.transform.position - _this.transform.position).sqrMagnitude
@@ -134,5 +138,27 @@ public class AnimalManager<T> : Singleton<AnimalManager<T>> where T : Animal
         }
 
         return null;
+    }
+
+    private void ResetList()
+    {
+        for(int i =0, size = packs.Count(); i < size; ++i)
+        {
+            var pack = packs[i];
+            if(pack.Count == 0) continue;
+
+            int j = 0;
+            int count = pack.Count;
+            while(j < count)
+            {
+                if (pack[j] == null)
+                {
+                    pack.Remove(pack[j]);
+                    continue;
+                }
+
+                ++j;
+            }
+        }
     }
 }
