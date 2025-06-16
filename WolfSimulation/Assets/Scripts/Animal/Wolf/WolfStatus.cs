@@ -20,6 +20,7 @@ public class WolfStatus : AnimalStatus
         dna = new DNAFactors(
             addHungerBySec,
             subfearBySec,
+            subHungerWhenEat,
             subUrgeToMateAfterMate,
             viewDist,
             moveSpeed,
