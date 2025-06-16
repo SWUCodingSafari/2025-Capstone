@@ -96,8 +96,13 @@ public class Deer : Animal
             return DeerState.Die;
         }
 
-        float runPoint = WolfList.Count + DeerList.Count(_ => _.State == DeerState.Run) + BaseStatus.fear;
-        if (runPoint > 0)
+        int runningDeerCount = DeerList.Count(_ => _.State == DeerState.Run);
+        int wolfCount = 0;
+        foreach (var d in DeerList)
+        {
+            wolfCount += d.WolfList.Count;
+        }
+        if (WolfList.Count > 0 || wolfCount > 0)
             return DeerState.Run;
 
         if(CheckState(DeerState.Mate) == true)
