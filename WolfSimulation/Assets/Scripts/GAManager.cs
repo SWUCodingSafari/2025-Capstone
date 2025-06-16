@@ -150,6 +150,12 @@ public class GAManager : SingletonBehaviour<GAManager>
                 top = i;
             }
         }
+
+        // 예외 처리 (0번이 top이고, 0번을 제외한 모든 늑대가 같은 수명일 경우)
+        if (top == 0 && second == 0 && initialWolfCount > 1)
+        {
+            second = UnityEngine.Random.Range(1, initialWolfCount);
+        }
     }
 
     private void RecordGenerationResult(int _fist, int _second)

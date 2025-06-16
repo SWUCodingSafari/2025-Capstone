@@ -198,10 +198,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 20
   maxHealth: 20
-  reduceHealthBySec: 0.1
+  reduceHealthBySec: 0.2
   addHealthByHealingSec: 2
-  hunger: 10
-  maxHunger: 10
+  hunger: 20
+  maxHunger: 20
   subHungerWhenEat: 2
   hungerCurve:
     serializedVersion: 2
@@ -246,7 +246,7 @@ MonoBehaviour:
   maxClusterDistance: 5
   minClusterDistance: 3
   loosePackTime: 5
-  viewDist: 10
+  viewDist: 30
   moveSpeed: 10
   runSpeed: 15
   maxRunSpeed: 20
