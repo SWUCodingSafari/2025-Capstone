@@ -131,7 +131,20 @@ public class GAManager : SingletonBehaviour<GAManager>
         top = 0; second = 0;
         for(int i = 0; i < initialWolfCount; ++i)
         {
-            if (wolfStatusList[i].lifeTime > wolfStatusList[top].lifeTime)
+            float lifeTime = wolfStatusList[i].lifeTime;
+            float topTime = wolfStatusList[top].lifeTime;
+            float secondTime = wolfStatusList[second].lifeTime;
+
+            if (lifeTime <= secondTime)
+                continue;
+
+            if (lifeTime > secondTime && lifeTime <= topTime)
+            {
+                second = i;
+                continue;
+            }
+
+            if(lifeTime > topTime)
             {
                 second = top;
                 top = i;
