@@ -178,8 +178,8 @@ public class GAManager : SingletonBehaviour<GAManager>
     {
         MyLogger.Instance.WriteLog($"[============Generation {GenCount}===========]");
         MyLogger.Instance.WriteLog(string.Format(
-            "{0,-8}: {1,10} | {2,10} | {3,10} | {4,10} | {5,10} | {6,10} | {7,10} | {8,10} | {9,10} | {10,10} | {11,10} | {12,10} | {13,10} | {14,10} | {15,10} | {16,10} | {17,10} | {18,10} | {19,10} | {20,10} | {21,10} |",
-            "Name", "LIFE_TIME", "AHBS", "SFBS","SUTMAM", "VD", "MS", "RS", "MRS", "MTABS","INDPD", "HUNG2RAD","EATAD","SEARCHAD","HEALAD","MATEAD","MOVEAD","HYSAD", "ATKRNG","CASEAD", "ATKAD", "MAXHUNGER"
+            "{0,-8}: {1,10} | {2,10} | {3,10} | {4,10} | {5,10} | {6,10} | {7,10} | {8,10} | {9,10} | {10,10} | {11,10} | {12,10} | {13,10} | {14,10} | {15,10} | {16,10} | {17,10} | {18,10} | {19,10} | {20,10} | {21,10} | {22,10} |",
+            "Name", "LIFE_TIME", "AHBS", "SFBS","SHWE", "SUTMAM", "VD", "MS", "RS", "MRS", "MTABS","INDPD", "HUNG2RAD","EATAD","SEARCHAD","HEALAD","MATEAD","MOVEAD","HYSAD", "ATKRNG","CASEAD", "ATKAD", "MAXHUNGER"
             ));
 
         string txt = "";

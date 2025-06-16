@@ -297,6 +297,7 @@ public class Wolf : Animal
         if (IsDied == true)
             return;
 
+        UpdateEnviroment();
         var newState = _newState >= 0 ? (WolfState)_newState : ChangeState();
 
         // 이미 그 행동을 진행 중

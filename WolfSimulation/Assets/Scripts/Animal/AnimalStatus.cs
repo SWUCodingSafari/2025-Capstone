@@ -71,9 +71,9 @@ public class AnimalStatus : MonoBehaviour
     [SerializeField] public float hysteresisAdder = 2f; //
 
     [Header("GA")]
-    [SerializeField] static public float settingOffset = 0.3f;
-    [SerializeField] static public float mutationRate = 0.1f; // 기존 설정 값은 0.05f
-    [SerializeField] static public float mutationValue = 0.1f; // 기존 설정 값은 0.05f
+    [SerializeField] static public float settingOffset = 0.4f;
+    [SerializeField] static public float mutationRate = 0.2f; // 기존 설정 값은 0.05f
+    [SerializeField] static public float mutationValue = 0.2f; // 기존 설정 값은 0.05f
 
     public DNAFactors dna;
 
