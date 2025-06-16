@@ -114,7 +114,15 @@ public class Deer : Animal
             CheckState(DeerState.Eat) ? 0f : BaseStatus.maxStamina - BaseStatus.stamina -
             BaseStatus.hungerCurve.Evaluate(BaseStatus.hunger / BaseStatus.maxHunger);
 
-        bool isThereGrassToEat = GrassList.Any(g => g.IsGrown == true && g.reservedBy == null);
+        bool isThereGrassToEat = false;
+        foreach (var grass in GrassList)
+        {
+            if (grass.IsGrown == true && grass.reservedBy == null)
+            {
+                isThereGrassToEat = true;
+                break;
+            }
+        }
 
         // 섭취 팩터: 풀이 없으면 정찰로 넘어가도록 유도
         stateFactors[(int)DeerState.Eat] = (isThereGrassToEat ? 1f : 0f)
@@ -390,6 +398,7 @@ public class Deer : Animal
     {
         Deer baby = Instantiate(this);
         baby.BaseStatus.SetStatus(this.BaseStatus);
+        baby.transform.position = (transform.position + _other.transform.position) / 2f;
     }
 
     public override void GetDamaged(float _value)

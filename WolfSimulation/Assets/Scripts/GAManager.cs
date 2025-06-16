@@ -116,14 +116,25 @@ public class GAManager : SingletonBehaviour<GAManager>
             wolfStatusList[i].dna = wolf.BaseStatus.dna;
             wolfStatusList[i].lifeTime = _lifeTime;
 
-            secondWolfId = topWolfId;
-            topWolfId = i;
-
             --totalWolfCount;
             if(totalWolfCount <= 0)
             {
+                GetTopAndSecond(out topWolfId, out secondWolfId);
                 RecordGenerationResult(topWolfId, secondWolfId);
                 ResetSimulation();
+            }
+        }
+    }
+
+    private void GetTopAndSecond(out int top, out int second)
+    {
+        top = 0; second = 0;
+        for(int i = 0; i < initialWolfCount; ++i)
+        {
+            if (wolfStatusList[i].lifeTime > wolfStatusList[top].lifeTime)
+            {
+                second = top;
+                top = i;
             }
         }
     }

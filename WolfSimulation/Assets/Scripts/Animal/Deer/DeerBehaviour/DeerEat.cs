@@ -34,7 +34,16 @@ public class DeerEat : AnimalStateBehaviour
         if (TGrass != null)
             return;
 
-        TGrass = animal.GrassList.Find(_ => _.IsGrown && _.reservedBy == null);
+        foreach(var grass in animal.GrassList)
+        {
+            if(grass.IsGrown == true && grass.reservedBy == null)
+            {
+                TGrass = grass;
+                break;
+            }
+        }
+
+        //TGrass = animal.GrassList.Find(_ => _.IsGrown && _.reservedBy == null);
         if (TGrass == null)
         {
             animal.OnEnviromentChanged();
