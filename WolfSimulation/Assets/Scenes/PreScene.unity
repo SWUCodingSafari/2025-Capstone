@@ -201,7 +201,7 @@ MonoBehaviour:
   reduceHealthBySec: 0.2
   addHealthByHealingSec: 2
   hunger: 10
-  maxHunger: 10
+  maxHunger: 30
   subHungerWhenEat: 2
   hungerCurve:
     serializedVersion: 2

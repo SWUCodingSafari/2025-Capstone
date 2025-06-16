@@ -17,7 +17,7 @@ public class AnimalStatus : MonoBehaviour
 
     [Header("Hunger")]
     [SerializeField] public float hunger = 10f;
-    [SerializeField] public float maxHunger = 10f;
+    [SerializeField] public float maxHunger = 10f; //
     [SerializeField] public float subHungerWhenEat = 3f;
     [SerializeField] public AnimationCurve hungerCurve;
     [SerializeField] public float addHungerBySec = 0.5f; // 
@@ -81,6 +81,7 @@ public class AnimalStatus : MonoBehaviour
     {
         public enum Factors
         {
+            maxHunger,
             addHungerBySec,
             subfearBySec,
             subUrgeToMateAfterMate,
@@ -107,6 +108,7 @@ public class AnimalStatus : MonoBehaviour
 
         public float[] factors;
 
+        //public float maxHunger;
         //public float addHungerBySec;
         //public float subfearBySec;
         //public float subUrgeToMateAfterMate;
@@ -130,6 +132,7 @@ public class AnimalStatus : MonoBehaviour
         }
 
         public DNAFactors(
+            float maxHunger,
             float addHungerBySec,
             float subfearBySec,
             float subUrgeToMateAfterMate,
@@ -154,6 +157,7 @@ public class AnimalStatus : MonoBehaviour
         {
             this.factors = new float[(int)Factors.WolfMAX];
 
+            this.factors[(int)Factors.maxHunger] = maxHunger;
             this.factors[(int)Factors.addHungerBySec] = addHungerBySec;
             this.factors[(int)Factors.subfearBySec] = subfearBySec;
             this.factors[(int)Factors.subUrgeToMateAfterMate] = subUrgeToMateAfterMate;
@@ -191,6 +195,7 @@ public class AnimalStatus : MonoBehaviour
     public virtual void Awake()
     {
         dna = new DNAFactors(
+            maxHunger,
             addHungerBySec,
             subfearBySec,
             subUrgeToMateAfterMate,
