@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.WSA;
 using DNA = AnimalStatus.DNAFactors;
 
 public class GAManager : SingletonBehaviour<GAManager>
@@ -128,11 +128,27 @@ public class GAManager : SingletonBehaviour<GAManager>
 
     private void GetTopAndSecond(out int top, out int second)
     {
-        top = 0; second = 0;
+        top = 0; second = -1;
         for(int i = 0; i < initialWolfCount; ++i)
         {
             float lifeTime = wolfStatusList[i].lifeTime;
             float topTime = wolfStatusList[top].lifeTime;
+
+            if(second < 0)
+            {
+                if (lifeTime <= topTime)
+                {
+                    second = i;
+                    continue;
+                }
+
+                if (lifeTime > topTime)
+                {
+                    second = top;
+                    top = i;
+                }
+            }
+
             float secondTime = wolfStatusList[second].lifeTime;
 
             if (lifeTime <= secondTime)
