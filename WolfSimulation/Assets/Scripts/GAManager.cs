@@ -19,6 +19,7 @@ public class GAManager : SingletonBehaviour<GAManager>
     [SerializeField]
     [Range(1f, 5f)]
     private float timeScale = 1f;
+    [SerializeField] private int maxGeneration = 55;
     [SerializeField] private WolfStatus initialStatus;
     private static int GenCount = 0;
     private int topWolfId, secondWolfId;
@@ -74,6 +75,15 @@ public class GAManager : SingletonBehaviour<GAManager>
     private void SetNextSimulation()
     {
         ++GenCount;
+        if(GenCount >= maxGeneration)
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+
+        }
         wolfList = GameObject.FindObjectsOfType<Wolf>();
         //deerList = GameObject.FindObjectsOfType<Deer>();
 

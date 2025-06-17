@@ -148,8 +148,7 @@ public class AnimalManager<T> : Singleton<AnimalManager<T>> where T : Animal
             if(pack.Count == 0) continue;
 
             int j = 0;
-            int count = pack.Count;
-            while(j < count)
+            while(j < pack.Count)
             {
                 if (pack[j] == null)
                 {
