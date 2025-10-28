@@ -12,7 +12,7 @@ public class WolfDie : AnimalStateBehaviour
 
         animal.anim.SetTrigger(DeerAnimation.Death);
 
-        GAManager.Instance.AnimalDied(animal, animal.LivingTime);
+        GameManager.Instance.AnimalDied(animal, animal.LivingTime);
     }
 
     public override void OnExit()

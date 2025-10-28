@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.WSA;
 using DNA = AnimalStatus.DNAFactors;
 
-public class GAManager : SingletonBehaviour<GAManager>
+public class GameManager : SingletonBehaviour<GameManager>
 {
     public struct GAResults
     {
@@ -75,14 +75,15 @@ public class GAManager : SingletonBehaviour<GAManager>
     private void SetNextSimulation()
     {
         ++GenCount;
-        if(GenCount >= maxGeneration)
+
+        // 최대 세대까지 시뮬레이션을 진행했다면 종료
+        if (GenCount >= maxGeneration) 
         {
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
             Application.Quit();
 #endif
-
         }
         wolfList = GameObject.FindObjectsOfType<Wolf>();
         //deerList = GameObject.FindObjectsOfType<Deer>();
@@ -129,9 +130,9 @@ public class GAManager : SingletonBehaviour<GAManager>
             --totalWolfCount;
             if(totalWolfCount <= 0)
             {
-                GetTopAndSecond(out topWolfId, out secondWolfId);
-                RecordGenerationResult(topWolfId, secondWolfId);
-                ResetSimulation();
+                GetTopAndSecond(out topWolfId, out secondWolfId); // 다음 세대 부모 계산
+                RecordGenerationResult(topWolfId, secondWolfId); // 이번 세대 결과 저장
+                ResetSimulation(); // 시뮬레이션 재시작
             }
         }
     }
@@ -139,41 +140,31 @@ public class GAManager : SingletonBehaviour<GAManager>
     private void GetTopAndSecond(out int top, out int second)
     {
         top = 0; second = -1;
-        for(int i = 0; i < initialWolfCount; ++i)
+
+        GAResults[] tempList = wolfStatusList;
+
+        for(int i = 0; i < 2; ++i)
         {
-            float lifeTime = wolfStatusList[i].lifeTime;
-            float topTime = wolfStatusList[top].lifeTime;
-
-            if(second < 0)
+            int minIndex = i;
+            for(int j = i + 1; j < initialWolfCount; ++j)
             {
-                if (lifeTime <= topTime)
+                if (tempList[j].lifeTime > tempList[minIndex].lifeTime)
                 {
-                    second = i;
-                    continue;
-                }
-
-                if (lifeTime > topTime)
-                {
-                    second = top;
-                    top = i;
+                    minIndex = j;
                 }
             }
 
-            float secondTime = wolfStatusList[second].lifeTime;
+            var temp = tempList[i];
+            tempList[i] = tempList[minIndex];
+            tempList[minIndex] = temp;
 
-            if (lifeTime <= secondTime)
-                continue;
-
-            if (lifeTime > secondTime && lifeTime <= topTime)
+            if(i ==0)
             {
-                second = i;
-                continue;
+                top = minIndex;
             }
-
-            if(lifeTime > topTime)
+            else
             {
-                second = top;
-                top = i;
+                second = minIndex;
             }
         }
 
