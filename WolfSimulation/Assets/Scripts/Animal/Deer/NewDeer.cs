@@ -122,7 +122,6 @@ public class NewDeer : MonoBehaviour
         BaseStatus.Health -= damage;
         if (BaseStatus.Health < 0f)
         {
-            IsDied = true;
             SelectStateAndBehave((int)NDeerState.Die);
             return true;
         }

@@ -83,6 +83,7 @@ public class AnimalStatus : MonoBehaviour
         public enum Factors
         {
             maxHunger,
+            scentSencitivity,
             addHungerBySec,
             subHungerWhenEat,
             subfearBySec,
@@ -135,6 +136,7 @@ public class AnimalStatus : MonoBehaviour
 
         public DNAFactors(
             float maxHunger,
+            float scentSencitivity,
             float addHungerBySec,
             float subHungerWhenEat,
             float subfearBySec,
@@ -161,6 +163,7 @@ public class AnimalStatus : MonoBehaviour
             this.factors = new float[(int)Factors.WolfMAX];
 
             this.factors[(int)Factors.maxHunger] = maxHunger;
+            this.factors[(int)Factors.scentSencitivity] = scentSencitivity;
             this.factors[(int)Factors.addHungerBySec] = addHungerBySec;
             this.factors[(int)Factors.subHungerWhenEat] = subHungerWhenEat;
             this.factors[(int)Factors.subfearBySec] = subfearBySec;
@@ -200,6 +203,7 @@ public class AnimalStatus : MonoBehaviour
     {
         dna = new DNAFactors(
             maxHunger,
+            scentSencitivity,
             addHungerBySec,
             subHungerWhenEat,
             subfearBySec,
@@ -226,6 +230,7 @@ public class AnimalStatus : MonoBehaviour
     {
         this.health = status.health;
         this.maxHealth = status.maxHealth;
+        this.scentSencitivity = status.scentSencitivity;
         this.reduceHealthBySec = status.reduceHealthBySec;
         this.addHealthByHealingSec = status.addHealthByHealingSec;
 
