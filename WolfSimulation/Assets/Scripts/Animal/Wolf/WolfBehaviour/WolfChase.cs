@@ -8,7 +8,7 @@ public class WolfChase : AnimalStateBehaviour
 {
     private WolfStatus status;
 
-    private Deer targetDeer = null;
+    private NewDeer targetDeer = null;
     private float elapsedTime = 0f;
     private bool canAttack = true;
 
@@ -29,15 +29,16 @@ public class WolfChase : AnimalStateBehaviour
         animal.anim.SetBool(WolfAnimation.IsChasing, false);
     }
 
+
     public override bool Update()
     {
-        Debug.Log($"Target id: {targetDeer.id}, ({animal.id})");
+        Debug.Log($"Target id: {targetDeer.name}, ({animal.id})");
 
         SetMoveDir();
 
         if(canAttack == false)
         {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += Time.fixedDeltaTime;
 
             canAttack = elapsedTime >= status.attackCoolTime;
         }
@@ -133,7 +134,7 @@ public class WolfChase : AnimalStateBehaviour
         return;
     }
 
-    private Deer SetTarget()
+    private NewDeer SetTarget()
     {
         animal.UpdateEnviroment();
 

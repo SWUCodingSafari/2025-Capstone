@@ -32,7 +32,7 @@ public class GameManager : SingletonBehaviour<GameManager>
     private int initialWolfCount = 0;
 
     [Header("Deer")]
-    [SerializeField] private Deer[] deerList;
+    [SerializeField] private NewDeer[] deerList;
 
     private string logFilePath;
 

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static Deer;
 
 public class Wolf : Animal
 {/*
@@ -126,7 +125,7 @@ public class Wolf : Animal
         
         bool noWolfNearby = WolfList.Count == 0;
         bool isWolfMating = WolfList.Any(_ => _.IsMating == true);
-        bool packHungry = WolfList.Count == 0 || WolfList.Average(w => w.BaseStatus.hunger) / BaseStatus.maxHunger < 0.7f;
+        bool packHungry = WolfList.Count == 0 || WolfList.Average(w => w.BaseStatus.hunger) / BaseStatus.maxHunger >= 0.7f;
 
         // 추격
         stateFactors[(int)WolfState.Chase] = (isThereDeer && isThereDeadDeer == false && 
@@ -141,14 +140,6 @@ public class Wolf : Animal
         float distToNearestWolf = WolfList.Count > 0 ? (WolfList[0].transform.position - transform.position).magnitude : -1f;
         stateFactors[(int)WolfState.Move] = (isMoving == false || (CheckState(WolfState.Eat) || distToNearestWolf < 0f) ? 0f :
             Mathf.Abs(distToNearestWolf - BaseStatus.maxClusterDistance) * BaseStatus.moveAdder);
-
-        // 번식
-        //bool canMate = CheckIfThisCanMate();
-        //if (LookingForMate != canMate && canMate == true)
-        //{
-        //    Mate();
-        //}
-        //LookingForMate = canMate;
 
         // 회복
         bool enoughHunger = hungerRatio <= 0.5f;
@@ -217,11 +208,11 @@ public class Wolf : Animal
             }
             else
             {
-                if (a.BaseStatus.stamina > b.BaseStatus.stamina)
+                if (a.BaseStatus.Health > b.BaseStatus.Health)
                 {
                     return 1;
                 }
-                else if (a.BaseStatus.stamina < b.BaseStatus.stamina)
+                else if (a.BaseStatus.Health < b.BaseStatus.Health)
                     return -1;
                 else
                     return 0;
@@ -246,22 +237,14 @@ public class Wolf : Animal
         // 늑대 정렬 (가까운 순)
         WolfList.Sort((a, b) =>
         {
-            if ((a.transform.position - transform.position).sqrMagnitude <
-            (b.transform.position - transform.position).sqrMagnitude)
-            {
-                return 1;
-            }
-            else if ((a.transform.position - transform.position).sqrMagnitude >
-            (b.transform.position - transform.position).sqrMagnitude)
-                return -1;
+            float da = (a.transform.position - transform.position).sqrMagnitude;
+            float db = (b.transform.position - transform.position).sqrMagnitude;
+
+            if (da < db) return -1;
+            if (da > db) return 1;
             return 0;
         });
 
-    }
-
-    public override void Update()
-    {
-        base.Update();
     }
 
     protected override void BehaviourCycle()
@@ -270,7 +253,7 @@ public class Wolf : Animal
 
         float subBySec = CheckState(WolfState.MAX) ? BaseStatus.subStaminaByWalkSec :
             stateBehaviours[(int)state].ReducedStamina();
-        BaseStatus.stamina = Mathf.Clamp(BaseStatus.stamina - subBySec * Time.deltaTime, 0f, BaseStatus.maxStamina);
+        BaseStatus.stamina = Mathf.Clamp(BaseStatus.stamina - subBySec * Time.fixedDeltaTime, 0f, BaseStatus.maxStamina);
 
         if(CheckState(WolfState.MAX) == false )
             stateBehaviours[(int)state].OnBehaviourCycle();
@@ -366,7 +349,7 @@ public class Wolf : Animal
             GiveBirth(mate);
         }
 
-        SelectStateAndBehave((int)DeerState.Idle);
+        SelectStateAndBehave((int)NewDeer.NDeerState.Idle);
     }
 
     public override bool CheckIfThisCanMate()
@@ -390,9 +373,9 @@ public class Wolf : Animal
         baby.transform.position = (this.transform.position + _other.transform.position) / 2f;
     }
 
-    public void Attack(Deer _target)
+    public void Attack(NewDeer _target)
     {
-        _target.GetDamaged((BaseStatus as WolfStatus).damage);
+        _target.Attacked((BaseStatus as WolfStatus).damage);
     }
 
     public override void GetDamaged(float _value)

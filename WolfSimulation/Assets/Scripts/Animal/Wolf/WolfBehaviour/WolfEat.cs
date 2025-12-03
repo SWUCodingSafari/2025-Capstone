@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WolfEat : AnimalStateBehaviour
 {
-    private Deer targetDeer = null;
+    private NewDeer targetDeer = null;
 
     private float elapsedTime = 0f;
     private float eatTime = 1f;
@@ -60,18 +60,19 @@ public class WolfEat : AnimalStateBehaviour
                 return false;
             }
 
-            elapsedTime += Time.deltaTime;
+            elapsedTime += Time.fixedDeltaTime;
             if (elapsedTime < eatTime) return false;
 
             elapsedTime -= eatTime;
 
-            if(targetDeer.GetEaten() == false)
+            float meat = targetDeer.Eaten();
+            if(meat == -1f)
             {
                 animal.DeerList.Remove(targetDeer);
                 targetDeer = null;
             }
             animal.BaseStatus.hunger = Mathf.Clamp(
-                animal.BaseStatus.hunger - animal.BaseStatus.subHungerWhenEat, 0, animal.BaseStatus.maxHunger);
+                animal.BaseStatus.hunger - animal.BaseStatus.subHungerWhenEat * meat, 0, animal.BaseStatus.maxHunger);
             return true;
         }
 

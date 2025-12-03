@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Searcher;
 using UnityEngine;
 
 public class WolfSearch : AnimalStateBehaviour
@@ -76,7 +77,7 @@ public class WolfSearch : AnimalStateBehaviour
 
     public override bool Update()
     {
-        elapsedTime += Time.deltaTime;
+        elapsedTime += Time.fixedDeltaTime;
         if (isThinking == true)
         {
             if(elapsedTime >= thinkTime)
@@ -112,7 +113,7 @@ public class WolfSearch : AnimalStateBehaviour
 
         animal.UpdateEnviroment();
 
-        Deer targetD = animal.DeerList[animal.DeerList.Count / 2]; // 적당한 거리의 풀을 선택
+        NewDeer targetD = animal.DeerList[animal.DeerList.Count / 2]; // 적당한 거리의 풀을 선택
         searchDir = (targetD.transform.position - animal.transform.position).normalized;
         searchDir.y = 0f;
         searchDir = searchDir.normalized;
@@ -120,17 +121,28 @@ public class WolfSearch : AnimalStateBehaviour
 
     private void FollowPack()
     {
-        // 무리가 향하는 방향 => 풀이 있을 가능성 높음
+        if(animal.WolfList.Count == 0)
+        {
+            searchDir = Vector3.zero;
+            return;
+        }
+
         Vector3 center = Vector3.zero;
         foreach (var wolf in animal.WolfList)
             center += wolf.transform.position;
-        center /= animal.DeerList.Count;
+        center /= animal.WolfList.Count;
 
-        searchDir = (center - animal.transform.position).normalized;
+        searchDir = (center - animal.transform.position);
+        searchDir.y = 0f;
+        searchDir = searchDir.normalized;
     }
 
     private void SearchRandom()
     {
+        searchDir = SearchByScent();
+        if (searchDir != Vector3.zero)
+            return;
+
         currentSearchWay = 0b10000; // 새로운 방향 초기화 어느 뱡향도 아님
 
         PickSearchDir();
@@ -183,5 +195,40 @@ public class WolfSearch : AnimalStateBehaviour
         }
 
         searchDir = searchDir.normalized;
+    }
+
+    private Vector3 SearchByScent()
+    {
+        if(TileMapManager.Instance == null)
+            return Vector3.zero;
+
+        TileMapManager.TileInfo myTile = TileMapManager.Instance.GetTile(animal.transform.position);
+        if(myTile == null) return Vector3.zero;
+
+        Vector2Int myPos = myTile.Index;
+        var tiles = TileMapManager.Instance.GetAroundTiles(animal.transform.position, animal.BaseStatus.scentSencitivity);
+        if(tiles == null || tiles.Count == 0 )
+            return Vector3.zero;
+
+        TileMapManager.TileInfo bestTile= null;
+        float bestScent = 0f;
+
+        foreach (var tile in tiles)
+        {
+            if(tile.deerScent > bestScent)
+            {
+                bestScent = tile.deerScent;
+                bestTile = tile;
+            }
+        }
+
+        if(bestTile == null || bestScent <= 0.01f)
+        {
+            return Vector3.zero;
+        }
+
+        Vector3 dir = new Vector3(bestTile.Index.x - myPos.x, 0f, bestTile.Index.y - myPos.y);
+
+        return dir.normalized;
     }
 }

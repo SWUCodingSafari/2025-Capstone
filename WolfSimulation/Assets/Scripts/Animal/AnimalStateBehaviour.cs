@@ -5,10 +5,16 @@ using UnityEngine;
 public abstract class AnimalStateBehaviour
 {
     protected Animal animal;
+    protected GameObject obj;
 
     public void Init(Animal _animal)
     {
         animal = _animal;
+    }
+
+    public void Init(GameObject _obj)
+    {
+        obj = _obj;
     }
 
     public abstract void OnEnter();
@@ -19,5 +25,6 @@ public abstract class AnimalStateBehaviour
     }
     public virtual void OnBehaviourCycle() { }
     public abstract bool Update();
+    public virtual void OnFixedUpdate() { }
     public abstract void OnExit();
 }

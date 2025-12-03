@@ -26,7 +26,7 @@ public class WolfIdle : AnimalStateBehaviour
 
     public override bool Update()
     {
-        elapsedTime += Time.deltaTime;
+        elapsedTime += Time.fixedDeltaTime;
         if (elapsedTime >= randomActTime)
         {
             elapsedTime -= randomActTime;
@@ -38,7 +38,7 @@ public class WolfIdle : AnimalStateBehaviour
                 animal.anim.SetTrigger(WolfAnimation.IdleRandom2);
         }
 
-        animal.BaseStatus.stamina = Mathf.Clamp(animal.BaseStatus.stamina + animal.BaseStatus.addStaminaBySec * Time.deltaTime,
+        animal.BaseStatus.stamina = Mathf.Clamp(animal.BaseStatus.stamina + animal.BaseStatus.addStaminaBySec * Time.fixedDeltaTime,
             0, animal.BaseStatus.maxStamina);
         return false;
     }
