@@ -17,11 +17,11 @@ public class WolfHealing : AnimalStateBehaviour
     public override bool Update()
     {
         animal.BaseStatus.health =
-            Mathf.Clamp(animal.BaseStatus.health + animal.BaseStatus.addHealthByHealingSec * Time.deltaTime,
+            Mathf.Clamp(animal.BaseStatus.health + animal.BaseStatus.addHealthByHealingSec * Time.fixedDeltaTime,
             0f, animal.BaseStatus.maxHealth);
 
         animal.BaseStatus.hunger =
-            Mathf.Clamp(animal.BaseStatus.hunger - animal.BaseStatus.addHungerByheallingSec * Time.deltaTime,
+            Mathf.Clamp(animal.BaseStatus.hunger - animal.BaseStatus.addHungerByheallingSec * Time.fixedDeltaTime,
             0f, animal.BaseStatus.maxHunger);
         return true;
     }

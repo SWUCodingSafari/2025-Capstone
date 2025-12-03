@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class Deer : Animal
+public class OldDeer : Animal
 {
     /*
      * [행동 리스트]
@@ -96,7 +96,7 @@ public class Deer : Animal
             return DeerState.Die;
         }
 
-        int runningDeerCount = DeerList.Count(_ => _.State == DeerState.Run);
+        int runningDeerCount = 0;//DeerList.Count(_ => _.State == DeerState.Run);
         int wolfCount = 0;
         foreach (var d in DeerList)
         {
@@ -280,11 +280,6 @@ public class Deer : Animal
 
     }
 
-    public override void Update()
-    {
-        base.Update();
-    }
-
     protected override void BehaviourCycle()
     {
         base.BehaviourCycle();
@@ -351,7 +346,7 @@ public class Deer : Animal
         Debug.Log($"{id} want to mate");
         if (_mateAnimal == null) // 이제 짝 찾기
         {
-            mate = AnimalManager<Deer>.Instance.WantMate(this);
+            mate = AnimalManager<OldDeer>.Instance.WantMate(this);
         }
         else
         {
@@ -401,7 +396,7 @@ public class Deer : Animal
 
     protected override void GiveBirth(Animal _other)
     {
-        Deer baby = Instantiate(this);
+        OldDeer baby = Instantiate(this);
         baby.BaseStatus.SetStatus(this.BaseStatus);
         baby.transform.position = (transform.position + _other.transform.position) / 2f;
     }
@@ -430,13 +425,13 @@ public class Deer : Animal
     {
         base.OnTriggerEnter(other);
 
-        Deer otherDeer = null;
-        if(IsThereComponent<Deer>(other, out otherDeer) == false)
+        OldDeer otherDeer = null;
+        if(IsThereComponent<OldDeer>(other, out otherDeer) == false)
         {
             return;
         }
 
-        AnimalManager<Deer>.Instance.MeetPack(this, otherDeer);
+        AnimalManager<OldDeer>.Instance.MeetPack(this, otherDeer);
         if (BaseStatus.coLoosePack != null)
         {
             StopCoroutine(BaseStatus.coLoosePack);
@@ -448,8 +443,8 @@ public class Deer : Animal
     {
         base.OnTriggerExit(other);
 
-        Deer otherDeer = null;
-        if (IsThereComponent<Deer>(other, out otherDeer) == false)
+        OldDeer otherDeer = null;
+        if (IsThereComponent<OldDeer>(other, out otherDeer) == false)
         {
             return;
         }
@@ -457,7 +452,7 @@ public class Deer : Animal
         if(DeerList.Count <= 0)
         {
             // 주변에 무리가 보이지 않음
-            BaseStatus.coLoosePack = StartCoroutine(CoLoosePack<Deer>());
+            BaseStatus.coLoosePack = StartCoroutine(CoLoosePack<OldDeer>());
         }
     }
 

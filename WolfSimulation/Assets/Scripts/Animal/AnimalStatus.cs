@@ -22,6 +22,7 @@ public class AnimalStatus : MonoBehaviour
     [SerializeField] public AnimationCurve hungerCurve;
     [SerializeField] public float addHungerBySec = 0.5f; // 
     [SerializeField] public float addHungerByheallingSec = 1f;
+    [SerializeField] public int scentSencitivity = 5;
 
     [Header("Stamina")]
     [SerializeField] public float stamina = 10f;

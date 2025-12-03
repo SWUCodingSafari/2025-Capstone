@@ -1,8 +1,90 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WeatherSystem : MonoBehaviour
 {
+    public enum WeatherState
+    {
+        None,
+        Rain,
+        Snow,
+    }
+
+    public enum Degree
+    {
+        Warm,
+        Cool,
+        Cold,
+    }
+
+    public enum WindDirection
+    {
+        None,
+        North,
+        South,
+        East,
+        West,
+        NorthEast,
+        NorthWest,
+        SouthEast,
+        SouthWest,
+    }
+
+    public static Vector2Int DirectionToOffset(WindDirection dir)
+    {
+        switch(dir)
+        {
+            case WindDirection.North: return new Vector2Int(0, 1);
+            case WindDirection.South: return new Vector2Int(0, -1);
+            case WindDirection.East: return new Vector2Int(1, 0);
+            case WindDirection.West: return new Vector2Int(-1, 0);
+            case WindDirection.NorthEast: return new Vector2Int(1, 1);
+            case WindDirection.NorthWest: return new Vector2Int(-1, 1);
+            case WindDirection.SouthEast: return new Vector2Int(1, -1);
+            case WindDirection.SouthWest: return new Vector2Int(-1, -1);
+            default: return Vector2Int.zero;
+        }
+    }
+
+    [Serializable]
+    public class WeatherSetting
+    {
+        public WeatherState State;
+        public float RunAdder;
+        public float GrassGrowAdder;
+        public float VisionAdder;
+        public float Percentage;
+    }
+
+    public class WeatherInfo
+    {
+        public WeatherState State;
+        public Degree Degree;
+        public WindDirection windDirection;
+        public float windSpeed;
+
+        public Transform Center;
+        public float Range;
+    }
+
+    private void OnWeatherStart()
+    {
+        /*
+         * 여기에 날씨 설정
+         * - 날씨 Center Transform 생성
+         * - Center Transform 기준으로 날씨 범위(random.range)
+         */
+    }
+
+    [Header("WeatherSetting")]
+    [SerializeField] private List<WeatherSetting> weatherSettings;
+    private Dictionary<WeatherState, WeatherSetting> WeatherDiction;
+
+    [SerializeField] private float AddWeatherRate = 0.01f;
+
+
     [Header("비 설정")]
     public ParticleSystem rainParticleSystem;             // 비 파티클 시스템
     [SerializeField] private float rainDuration = 8f;     // 비 지속 시간
@@ -19,6 +101,11 @@ public class WeatherSystem : MonoBehaviour
 
     void Start()
     {
+        foreach (var weatherSetting in weatherSettings)
+        {
+            WeatherDiction[weatherSetting.State] = weatherSetting;
+        }
+
         // 비 파티클 시스템 초기화
         emissionModule = rainParticleSystem.emission;
         emissionModule.rateOverTime = 0f;
@@ -86,5 +173,27 @@ public class WeatherSystem : MonoBehaviour
             windZone.windTurbulence = 0f;
             yield return new WaitForSeconds(10f);
         }
+    }
+
+    private WeatherSetting GetRandomWeatherByPercentage()
+    {
+        float total = 0f;
+
+        foreach (var ws in weatherSettings)
+            total += ws.Percentage;
+
+        float rand = UnityEngine.Random.Range(0, total);
+        float cumulative = 0f;
+
+        foreach (var ws in weatherSettings)
+        {
+            cumulative += ws.Percentage;
+            if (rand <= cumulative)
+            {
+                return ws;
+            }
+        }
+
+        return weatherSettings[0];
     }
 }

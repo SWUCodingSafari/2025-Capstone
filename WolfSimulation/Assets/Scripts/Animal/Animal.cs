@@ -23,7 +23,7 @@ public abstract class Animal : MonoBehaviour
 
     // near by enviroment
     public List<Grass> GrassList { get; set; }
-    public List<Deer> DeerList { get; set; }
+    public List<NewDeer> DeerList { get; set; }
     public List<Wolf> WolfList { get; set; }
 
     protected UnityAction enviromentChanged;
@@ -86,7 +86,7 @@ public abstract class Animal : MonoBehaviour
         enviromentChanged = OnEnviromentChanged;
 
         GrassList = new List<Grass>();
-        DeerList = new List<Deer>();
+        DeerList = new List<NewDeer>();
         WolfList = new List<Wolf>();
 
         BaseStatus.wfLoosePack = new WaitForSeconds(BaseStatus.loosePackTime);
@@ -95,17 +95,14 @@ public abstract class Animal : MonoBehaviour
     private void FixedUpdate()
     {
         rigid.angularVelocity = Vector3.zero;
-    }
 
-    public virtual void Update()
-    {
-        livingTime += Time.deltaTime;
+        livingTime += Time.fixedDeltaTime;
 
         if (IsDied == true)
             return;
 
         // 해당 행동 진행 이후 변경 사항 있을 경우 다시 환경 체크
-        if(currentBehaviour?.Invoke() == true)
+        if (currentBehaviour?.Invoke() == true)
         {
             enviromentChanged?.Invoke();
         }
@@ -119,12 +116,12 @@ public abstract class Animal : MonoBehaviour
 
     protected virtual void BehaviourCycle()
     {
-        BaseStatus.urgeToMate = Mathf.Clamp(BaseStatus.urgeToMate + BaseStatus.addUrgeToMateBySec * Time.deltaTime, 0f, BaseStatus.maxUrgeToMate);
-        BaseStatus.hunger = Mathf.Clamp(BaseStatus.hunger + BaseStatus.addHungerBySec * Time.deltaTime, 0f, BaseStatus.maxHunger);
+        BaseStatus.urgeToMate = Mathf.Clamp(BaseStatus.urgeToMate + BaseStatus.addUrgeToMateBySec * Time.fixedDeltaTime, 0f, BaseStatus.maxUrgeToMate);
+        BaseStatus.hunger = Mathf.Clamp(BaseStatus.hunger + BaseStatus.addHungerBySec * Time.fixedDeltaTime, 0f, BaseStatus.maxHunger);
 
         if(BaseStatus.hunger >= BaseStatus.maxHunger)
         {
-            BaseStatus.health = Mathf.Clamp(BaseStatus.health - BaseStatus.reduceHealthBySec * Time.deltaTime, 0f, BaseStatus.maxHealth);
+            BaseStatus.health = Mathf.Clamp(BaseStatus.health - BaseStatus.reduceHealthBySec * Time.fixedDeltaTime, 0f, BaseStatus.maxHealth);
         }
     }
 
@@ -156,21 +153,21 @@ public abstract class Animal : MonoBehaviour
 
     protected virtual void CheckTriggedObjAndAdd(Collider other)
     {
-        Grass grass;
-        if (IsThereComponent<Grass>(other, out grass) == true)
-        {
-            if (grass.reservedBy != null )
-                return;
+        //Grass grass;
+        //if (IsThereComponent<Grass>(other, out grass) == true)
+        //{
+        //    if (grass.reservedBy != null )
+        //        return;
+        //
+        //    GrassList.Add(grass);
+        //    enviromentChanged?.Invoke();
+        //    return;
+        //}
 
-            GrassList.Add(grass);
-            enviromentChanged?.Invoke();
-            return;
-        }
-
-        Deer deer;
-        if(IsThereComponent<Deer>(other, out deer) == true)
+        NewDeer deer;
+        if(IsThereComponent<NewDeer>(other, out deer) == true)
         {
-            if(deer as Animal == this ||
+            if(deer  == this ||
                 DeerList.Any( _ => _ == deer))
             {
                 // 자기자신 검출 추가 안함
@@ -200,16 +197,16 @@ public abstract class Animal : MonoBehaviour
 
     protected virtual void CheckTriggerObjAndRemove(Collider other)
     {
-        Grass grass;
-        if (IsThereComponent<Grass>(other, out grass) == true)
-        {
-            GrassList.Remove(grass);
-            enviromentChanged?.Invoke();
-            return;
-        }
+        //Grass grass;
+        //if (IsThereComponent<Grass>(other, out grass) == true)
+        //{
+        //    GrassList.Remove(grass);
+        //    enviromentChanged?.Invoke();
+        //    return;
+        //}
 
-        Deer deer;
-        if (IsThereComponent<Deer>(other, out deer) == true)
+        NewDeer deer;
+        if (IsThereComponent<NewDeer>(other, out deer) == true)
         {
             DeerList.Remove(deer);
             enviromentChanged?.Invoke();
@@ -266,14 +263,14 @@ public abstract class Animal : MonoBehaviour
     public void MovePosition(float _moveSpeed = -1f)
     {
         if(_moveSpeed < 0f) _moveSpeed = BaseStatus.moveSpeed;
-        rigid.MovePosition(transform.position + transform.forward * BaseStatus.moveSpeed * Time.deltaTime);
+        rigid.MovePosition(transform.position + transform.forward * BaseStatus.moveSpeed * Time.fixedDeltaTime);
     }
 
     public void TurnToDesiredDir(Vector3 _targetDir)
     {
         transform.rotation = Quaternion.RotateTowards(transform.rotation,
             Quaternion.LookRotation(_targetDir),
-            BaseStatus.maxTurnAngleBySec * Time.deltaTime);
+            BaseStatus.maxTurnAngleBySec * Time.fixedDeltaTime);
     }
 
     public virtual void Die()

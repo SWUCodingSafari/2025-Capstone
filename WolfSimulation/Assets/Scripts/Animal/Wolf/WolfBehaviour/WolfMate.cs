@@ -47,7 +47,7 @@ public class WolfMate : AnimalStateBehaviour
                 animal.anim.SetBool(WolfAnimation.IsWalking, false);
             }
 
-            elapsedTime += Time.deltaTime;
+            elapsedTime += Time.fixedDeltaTime;
 
             if (elapsedTime > animal.BaseStatus.mateTime)
             {

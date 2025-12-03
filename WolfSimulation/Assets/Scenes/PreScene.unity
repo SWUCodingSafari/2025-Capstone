@@ -230,9 +230,10 @@ MonoBehaviour:
     m_RotationOrder: 4
   addHungerBySec: 3
   addHungerByheallingSec: 1
+  scentSencitivity: 10
   stamina: 20
   maxStamina: 20
-  subStaminaByWalkSec: 0.3
+  subStaminaByWalkSec: 0.01
   subStaminaByRunSec: 1
   subStaminaByMateSec: 0.8
   addStaminaBySec: 1.5
