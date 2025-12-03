@@ -71,7 +71,7 @@ public class RankTester : MonoBehaviour
             else Debug.Log($"Best: {best.map}, score={best.score}, stats={best.stats?.Count}, at={UnixToKst(best.updated_at)}");
         });
     }
-du
+
     private static string UnixToKst(long ms)
     {
         var epoch = System.DateTimeOffset.FromUnixTimeMilliseconds(ms).ToLocalTime();
