@@ -21,6 +21,9 @@ public class SignUpManager : MonoBehaviour
         {
             Debug.Log("회원 가입 성공");
             SignUpPanel.SetActive(false); // 회원 가입 성공 시 회원 가입 창 닫기
+            inputField_ID.text = ""; // ID 필드 초기화
+            inputFiled_PW.text = ""; // PW 필드 초기화
+            create_failed_text.text = "";
         }
         else
         {
