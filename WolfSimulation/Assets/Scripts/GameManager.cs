@@ -26,7 +26,8 @@ public class GameManager : SingletonBehaviour<GameManager>
     private const int MAINSCENENUMBER = 1;
 
     [Header("Wolf")]
-    [SerializeField] private Wolf[] wolfList;
+    [SerializeField] public Wolf[] wolfList;
+    public UnityEvent OnWolfListSet { get; private set; } = new UnityEvent();
     private GAResults[] wolfStatusList;
     private int totalWolfCount = 0;
     private int initialWolfCount = 0;
@@ -36,17 +37,22 @@ public class GameManager : SingletonBehaviour<GameManager>
 
     private string logFilePath;
 
+    public bool IsGameOver { get; private set; } = false;
+    public UnityEvent OnGameOver { get; private set; } = new UnityEvent();
+
 
     protected override void Init()
     {
         base.Init();
 
         DontDestroyOnLoad(gameObject);
+    }
 
+    public void StartSimulation()
+    {
         SceneManager.sceneLoaded += WaitForSceneLoad;
 
         SceneManager.LoadScene(MAINSCENENUMBER);
-
     }
 
     private void SetFistSimulation()
@@ -70,6 +76,7 @@ public class GameManager : SingletonBehaviour<GameManager>
         secondWolfId = 0;
 
         ++GenCount;
+        IsGameOver = false;
     }
 
     private void SetNextSimulation()
@@ -102,6 +109,7 @@ public class GameManager : SingletonBehaviour<GameManager>
 
     private void WaitForSceneLoad(Scene arg0, LoadSceneMode arg1)
     {
+        SceneManager.sceneLoaded -= WaitForSceneLoad;
         StartCoroutine(CoWaitForSetup(GenCount <= 0 ? SetFistSimulation: SetNextSimulation));
     }
 
@@ -132,7 +140,9 @@ public class GameManager : SingletonBehaviour<GameManager>
             {
                 GetTopAndSecond(out topWolfId, out secondWolfId); // 다음 세대 부모 계산
                 RecordGenerationResult(topWolfId, secondWolfId); // 이번 세대 결과 저장
-                ResetSimulation(); // 시뮬레이션 재시작
+                //ResetSimulation(); // 시뮬레이션 재시작
+                IsGameOver = true;
+                OnGameOver?.Invoke();
             }
         }
     }

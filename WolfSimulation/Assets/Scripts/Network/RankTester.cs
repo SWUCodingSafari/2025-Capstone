@@ -36,16 +36,16 @@ public class RankTester : MonoBehaviour
         Debug.Log($"Logged in as {NetworkManager.Instance.CurrentUsername} (uid={NetworkManager.Instance.CurrentUid})");
 
         // 3) 점수 제출(초원/폭우/설산 중 하나)
-        var stats = new Dictionary<string, float>
-        {
-            { "health", 7 },
-            { "attack", 3 },
-            { "speed", 5 }
-        };
-        yield return NetworkManager.Instance.Submit(NetworkManager.GameMap.plain, score: 2530, stats, (ok, msg, updated) =>
-        {
-            Debug.Log($"Submit => {ok}, updated:{updated}, msg:{msg}");
-        });
+        //var stats = new Dictionary<string, float>
+        //{
+        //    { "health", 7 },
+        //    { "attack", 3 },
+        //    { "speed", 5 }
+        //};
+        //yield return NetworkManager.Instance.Submit(NetworkManager.GameMap.plain, score: 2530, stats, (ok, msg, updated) =>
+        //{
+        //    Debug.Log($"Submit => {ok}, updated:{updated}, msg:{msg}");
+        //});
 
         // 4) Top10 조회
         yield return NetworkManager.Instance.GetTop(NetworkManager.GameMap.plain, 10, (ok, msg, rows) =>

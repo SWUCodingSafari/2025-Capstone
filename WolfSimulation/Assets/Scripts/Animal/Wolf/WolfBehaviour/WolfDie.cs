@@ -10,6 +10,7 @@ public class WolfDie : AnimalStateBehaviour
     {
         animal.IsDied = true;
 
+        (animal as Wolf).OnWolfDied?.Invoke();
         animal.anim.SetTrigger(DeerAnimation.Death);
 
         GameManager.Instance.AnimalDied(animal, animal.LivingTime);

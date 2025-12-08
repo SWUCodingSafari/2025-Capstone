@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Wolf : Animal
 {/*
@@ -63,6 +64,8 @@ public class Wolf : Animal
     [SerializeField] private float[] stateFactors = new float[(int)WolfState.MAX];
     private AnimalStateBehaviour[] stateBehaviours =
         new AnimalStateBehaviour[(int)WolfState.MAX];
+
+    public UnityEvent OnWolfDied { get; private set; } = new UnityEvent();
 
     public override void Init()
     {

@@ -152,7 +152,7 @@ MonoBehaviour:
   <LoosePackTime>k__BackingField: 5
   <MaxStateTime>k__BackingField: 3
   <MinStateTime>k__BackingField: 1
-  <scentStrength>k__BackingField: 0.05
+  <scentStrength>k__BackingField: 1
   <scentRadius>k__BackingField: 30
 --- !u!1 &3085512797062616824
 GameObject:

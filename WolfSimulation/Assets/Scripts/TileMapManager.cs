@@ -189,7 +189,7 @@ public class TileMapManager : MonoBehaviour
         {
             float dist = Vector2Int.Distance(index, t.Index);
             float normalized = Mathf.Clamp01(dist / radius);
-            float strength = Mathf.Lerp(10f, 0f, normalized);
+            float strength = Mathf.Lerp(maxStrength, 0f, normalized);
 
             t.AddScent(strength);
         }

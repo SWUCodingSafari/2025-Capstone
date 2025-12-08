@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 public class NetworkManager : SingletonBehaviour<NetworkManager>
 {
     [Header("Server")]
-    public string baseURL = "https://wolfsimulationserver-production.up.railway.app/";
+    public string baseURL = "https://wolfsimulationserver-production-9866.up.railway.app";
 
     [Header("Auth")]
     [SerializeField] private string jwtToken;
@@ -49,7 +49,7 @@ public class NetworkManager : SingletonBehaviour<NetworkManager>
     {
         public string map;
         public int score;
-        public Dictionary<string, float> stats;
+        public WolfState stats;
     }
 
     [Serializable]
@@ -153,10 +153,10 @@ public class NetworkManager : SingletonBehaviour<NetworkManager>
 
     #region API
     
-    public IEnumerator Submit(GameMap map, int score, Dictionary<string, float> stats, Action<bool, string, bool> done)
+    public IEnumerator Submit(GameMap map, int score, WolfState stats, Action<bool, string, bool> done)
     {
         if (!IsLoggedIn) { done?.Invoke(false, "not logged in", false); yield break; }
-        if (stats == null) stats = new Dictionary<string, float>();
+        if (stats == null) stats = new WolfState();
 
         var body = new SubmitReq { map = map.ToString(), score = score, stats = stats };
         yield return Send("/submit", "POST", body, jwtToken, (succ, txt, code) =>
