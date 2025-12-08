@@ -220,7 +220,7 @@ MonoBehaviour:
   rank_challenge_button: {fileID: 1031145442}
   leaderboard_button: {fileID: 1823904301}
   how_to_play_button: {fileID: 712712257}
-  how_to_play_x_button: {fileID: 0}
+  how_to_play_x_button: {fileID: 430303327}
 --- !u!114 &42212432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,7 +294,7 @@ MonoBehaviour:
   rank_challenge_button: {fileID: 1031145442}
   leaderboard_button: {fileID: 1823904301}
   how_to_play_button: {fileID: 712712257}
-  how_to_play_x_button: {fileID: 0}
+  how_to_play_x_button: {fileID: 341370347}
 --- !u!1 &87233746
 GameObject:
   m_ObjectHideFlags: 0
@@ -4916,7 +4916,7 @@ MonoBehaviour:
   rank_challenge_button: {fileID: 1031145442}
   leaderboard_button: {fileID: 1823904301}
   how_to_play_button: {fileID: 712712257}
-  how_to_play_x_button: {fileID: 0}
+  how_to_play_x_button: {fileID: 341370347}
 --- !u!1 &1416912069
 GameObject:
   m_ObjectHideFlags: 0
