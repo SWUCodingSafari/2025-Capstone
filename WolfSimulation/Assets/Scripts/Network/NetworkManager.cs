@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ public class NetworkManager : SingletonBehaviour<NetworkManager>
     {
         public string map;
         public int score;
-        public WolfState stats;
+        public Dictionary<string, float> stats;
     }
 
     [Serializable]
@@ -90,13 +91,20 @@ public class NetworkManager : SingletonBehaviour<NetworkManager>
     }
     #endregion
 
+    [SerializeField] private bool autoLogin;
+
     protected override void Init()
     {
         base.Init();
 
-        jwtToken = PlayerPrefs.GetString(PREF_JWT, "");
-        userName = PlayerPrefs.GetString(PREF_USERNAME, "");
-        uId = PlayerPrefs.GetInt(PREF_UID, 0);
+        DontDestroyOnLoad(gameObject);
+
+        jwtToken = null;
+        if (autoLogin)
+        {
+            userName = PlayerPrefs.GetString(PREF_USERNAME, "");
+            uId = PlayerPrefs.GetInt(PREF_UID, 0);
+        }
     }
 
     public bool IsLoggedIn => !string.IsNullOrEmpty(jwtToken);
@@ -110,8 +118,6 @@ public class NetworkManager : SingletonBehaviour<NetworkManager>
         yield return Send("/auth/register", "POST", body, null, (succ, txt, code) =>
         {
             if (!succ) { done?.Invoke(false, $"Register failed [{code}]: {txt}"); return; }
-            var res = JsonConvert.DeserializeObject<RegisterLoginRes>(txt);
-            SaveAuth(res);
             done?.Invoke(true, "ok");
         });
     }
@@ -121,7 +127,7 @@ public class NetworkManager : SingletonBehaviour<NetworkManager>
         var body = new RegisterLoginReq { username = id, password = pw };
         yield return Send("/auth/login", "POST", body, null, (succ, txt, code) =>
         {
-            if (!succ) { done?.Invoke(false, $"Login failed [{code}]: {txt}"); return; }
+            if (!succ) { Logout(); done?.Invoke(false, $"Login failed [{code}]: {txt}"); return; }
             var res = JsonConvert.DeserializeObject<RegisterLoginRes>(txt);
             SaveAuth(res);
             done?.Invoke(true, "ok");
@@ -133,7 +139,6 @@ public class NetworkManager : SingletonBehaviour<NetworkManager>
         jwtToken = "";
         userName = "";
         uId = 0;
-        PlayerPrefs.DeleteKey(PREF_JWT);
         PlayerPrefs.DeleteKey(PREF_USERNAME);
         PlayerPrefs.DeleteKey(PREF_UID);
         PlayerPrefs.Save();
@@ -144,7 +149,6 @@ public class NetworkManager : SingletonBehaviour<NetworkManager>
         jwtToken = res.token;
         userName = res.username;
         uId = res.uid;
-        PlayerPrefs.SetString(PREF_JWT, jwtToken);
         PlayerPrefs.SetString(PREF_USERNAME, userName);
         PlayerPrefs.SetInt(PREF_UID, uId);
         PlayerPrefs.Save();
@@ -158,7 +162,7 @@ public class NetworkManager : SingletonBehaviour<NetworkManager>
         if (!IsLoggedIn) { done?.Invoke(false, "not logged in", false); yield break; }
         if (stats == null) stats = new WolfState();
 
-        var body = new SubmitReq { map = map.ToString(), score = score, stats = stats };
+        var body = new SubmitReq { map = map.ToString(), score = score, stats = stats.GetDict() };
         yield return Send("/submit", "POST", body, jwtToken, (succ, txt, code) =>
         {
             if (!succ) { done?.Invoke(false, $"Submit failed [{code}]: {txt}", false); return; }

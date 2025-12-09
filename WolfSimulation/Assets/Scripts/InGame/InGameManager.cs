@@ -12,6 +12,8 @@ public class InGameManager : MonoBehaviour
 
     [SerializeField] private GameObject InGameUI;
     [SerializeField] private GameObject GameOverUI;
+    [SerializeField] private Image BG;
+    [SerializeField] private Sprite[] BGImage = new Sprite[(int)NetworkManager.GameMap.MAX];
     [SerializeField] private GameObject loadingUI;
 
     [SerializeField] private GameObject resultPanel;
@@ -24,7 +26,6 @@ public class InGameManager : MonoBehaviour
 
     [SerializeField] private NetworkConnecter connecter;
     [SerializeField] private NetworkManager.GameMap curMap;
-    private WolfState wolfState;
 
     private int RetryCount = 5;
     private int curScore = 0;
@@ -36,6 +37,7 @@ public class InGameManager : MonoBehaviour
         sec = 0;
         RetryCount = 5;
         GameManager.Instance.OnGameOver.AddListener(SendRecordToServer);
+        BG.sprite = BGImage[(int)curMap];
 
         InGameUI.SetActive(true);
         GameOverUI.SetActive(false);
@@ -67,6 +69,8 @@ public class InGameManager : MonoBehaviour
             return;
         }
 
+        --RetryCount;
+
         GameOverUI.SetActive(true);
         loadingUI.SetActive(true);
         resultPanel.SetActive(false);
@@ -74,7 +78,7 @@ public class InGameManager : MonoBehaviour
         curScore = Mathf.FloorToInt(time);
         myScore.text = curScore.ToString();
         
-        connecter.Submit(curMap, curScore, wolfState, OnSubmit);
+        connecter.Submit(curMap, curScore, GameManager.Instance.CurState, OnSubmit);
     }
 
     private void OnSubmit(bool ok, string msg, bool code)

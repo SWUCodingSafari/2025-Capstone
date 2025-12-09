@@ -55,7 +55,7 @@ public class WolfStatus : AnimalStatus
         this.attackRange = wStatus.attackRange;
         this.attackCoolTime = wStatus.attackCoolTime;
         this.slowAfterAttack = wStatus.slowAfterAttack;
-        ;
+        
         this.chaseAdder = wStatus.chaseAdder;
         this.attackAdder = wStatus.attackAdder;
     }

@@ -128,7 +128,7 @@ public class Wolf : Animal
         
         bool noWolfNearby = WolfList.Count == 0;
         bool isWolfMating = WolfList.Any(_ => _.IsMating == true);
-        bool packHungry = WolfList.Count == 0 || WolfList.Average(w => w.BaseStatus.hunger) / BaseStatus.maxHunger > 0.3f;
+        bool packHungry = WolfList.Count == 0 || WolfList.Average(w => w.BaseStatus.hunger) / BaseStatus.maxHunger > BaseStatus.hungerSencitivity;
 
         // Ãß°Ý
         stateFactors[(int)WolfState.Chase] = (isThereDeer && isThereDeadDeer == false && 

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class InCamera : MonoBehaviour
@@ -18,6 +19,8 @@ public class InCamera : MonoBehaviour
     {
         camTrans = Camera.main.transform;
         GameManager.Instance.OnWolfListSet.AddListener(GetWolfList);
+
+        curWolfIndex = -1;
     }
 
     private void Update()
@@ -57,6 +60,8 @@ public class InCamera : MonoBehaviour
         if (wolfList[index].IsDied == true)
         {
             index = GetNextWolfIndex();
+            if (index < 0)
+                return;
         }
 
         curWolfIndex = index;
@@ -68,23 +73,37 @@ public class InCamera : MonoBehaviour
 
     public void ShowNext(bool isToLeft = false)
     {
-        int nextWolfIndex = GetNextWolfIndex(isToLeft);
+        int nextWolfIndex = GetNextWolfIndex(isToLeft, true);
+        if (nextWolfIndex < 0)
+            return;
+
         ShowWolf(nextWolfIndex);
     }
 
     private int GetNextWolfIndex(bool isToLeft = false, bool isStartNext = false)
     {
+        if (curWolfIndex < 0)
+            return -1;
+
         int index = curWolfIndex;
         if(isStartNext)
         {
-            index = (isToLeft ? index - 1 : index + 1) % 4;
+            index = (isToLeft ? index - 1 : index + 1) % wolfList.Length;
             index = index < 0 ? wolfList.Length - 1 : index;
+        }
+
+        bool isThereLivingWolf = wolfList.Any(w => w.IsDied == false);
+        if (isThereLivingWolf == false)
+        {
+            return -1;
         }
 
         while (wolfList[index].IsDied == true)
         {
-            index = (isToLeft ? index - 1 : index + 1) % 4;
-            index = index < 0 ? wolfList.Length - 1 : index;
+            if (isToLeft)
+                index = (index - 1 + wolfList.Length) % wolfList.Length;
+            else
+                index = (index + 1) % wolfList.Length;
         }
 
         return index;
@@ -125,10 +144,17 @@ public class InCamera : MonoBehaviour
             yield return null;
         }
 
-        camTrans.SetParent(newWolf);
-        camTrans.localPosition = camPosOffset;
+        camTrans.position = newWolf.transform.position + camPosOffset;
 
         isMoving = false;
+    }
+
+    private void LateUpdate()
+    {
+        if (isMoving || curWolf == null || GameManager.Instance.IsGameOver)
+            return;
+
+        camTrans.position = curWolf.transform.position + camPosOffset;
     }
 
     private void OnDestroy()

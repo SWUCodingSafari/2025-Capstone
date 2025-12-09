@@ -22,6 +22,7 @@ public class AnimalStatus : MonoBehaviour
     [SerializeField] public AnimationCurve hungerCurve;
     [SerializeField] public float addHungerBySec = 0.5f; // 
     [SerializeField] public float addHungerByheallingSec = 1f;
+    [SerializeField] public float hungerSencitivity = 0.3f;
     [SerializeField] public int scentSencitivity = 5;
 
     [Header("Stamina")]
@@ -328,6 +329,8 @@ public class AnimalStatus : MonoBehaviour
         this.mateAdder = status.mateAdder;
         this.moveAdder = status.moveAdder;
         this.hysteresisAdder = status.hysteresisAdder;
+
+        this.dna = status.dna;
     }
 
     // 랜덤 유전자 생성

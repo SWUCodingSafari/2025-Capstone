@@ -9,6 +9,13 @@ using DNA = AnimalStatus.DNAFactors;
 
 public class GameManager : SingletonBehaviour<GameManager>
 {
+    public enum SceneNumberConst
+    {
+        Plain = 1,
+        Rain = 1,
+        Snow = 1
+    }
+
     public struct GAResults
     {
         public int num;
@@ -16,14 +23,30 @@ public class GameManager : SingletonBehaviour<GameManager>
         public float lifeTime;
     }
 
+    [Serializable]
+    public class AdderByState
+    {
+        public WolfState.StateType type;
+        public float stateAdder;
+        public int maxState = 10;
+    }
+
+    [Header("Simulation")]
+    [SerializeField] private WolfStatus initialStatus;
+    private WolfStatus curInitialStatus;
+    [field: SerializeField] public int StateCount { get; private set; } = 20;
+    [SerializeField] private AdderByState[] adderSetting = new AdderByState[(int)WolfState.StateType.MAX];
+    public WolfState CurState { get; private set; }
+    
+
     [SerializeField]
     [Range(1f, 5f)]
     private float timeScale = 1f;
     [SerializeField] private int maxGeneration = 55;
-    [SerializeField] private WolfStatus initialStatus;
     private static int GenCount = 0;
     private int topWolfId, secondWolfId;
     private const int MAINSCENENUMBER = 1;
+
 
     [Header("Wolf")]
     [SerializeField] public Wolf[] wolfList;
@@ -48,22 +71,52 @@ public class GameManager : SingletonBehaviour<GameManager>
         DontDestroyOnLoad(gameObject);
     }
 
-    public void StartSimulation()
+    private void Start()
+    {
+        curInitialStatus = new WolfStatus();
+    }
+
+    public void StartSimulation(WolfState state, NetworkManager.GameMap map)
     {
         SceneManager.sceneLoaded += WaitForSceneLoad;
 
-        SceneManager.LoadScene(MAINSCENENUMBER);
+        CurState = state;
+
+        curInitialStatus.SetStatus(initialStatus);
+        curInitialStatus.health += state.Health * adderSetting[(int)WolfState.StateType.health].stateAdder;
+
+        float speedAdder = 0.8f + state.Speed * adderSetting[(int)WolfState.StateType.speed].stateAdder;
+        curInitialStatus.moveSpeed *= speedAdder;
+        curInitialStatus.runSpeed *= speedAdder;
+        curInitialStatus.maxRunSpeed *= speedAdder;
+
+
+        curInitialStatus.viewDist += state.Sight * adderSetting[(int)WolfState.StateType.Sight].stateAdder;
+        curInitialStatus.hungerSencitivity += state.HungerSensitivity * adderSetting[(int)WolfState.StateType.HungerSensitivity].stateAdder;
+        curInitialStatus.scentSencitivity += Mathf.RoundToInt(state.ScentSensitivity * adderSetting[(int)WolfState.StateType.ScentSensitivity].stateAdder);
+
+
+        int SceneNumber = 0;
+        switch(map)
+        {
+            case NetworkManager.GameMap.plain: SceneNumber = (int)SceneNumberConst.Plain; break;
+            case NetworkManager.GameMap.rain: SceneNumber = (int)SceneNumberConst.Rain; break;
+            case NetworkManager.GameMap.snow: SceneNumber = (int)SceneNumberConst.Snow; break;
+            default: SceneNumber = (int) SceneNumberConst.Plain;  break;
+        }
+        SceneManager.LoadScene(SceneNumber);
     }
 
     private void SetFistSimulation()
     {
         wolfList = GameObject.FindObjectsOfType<Wolf>();
+        OnWolfListSet?.Invoke();
         //deerList = GameObject.FindObjectsOfType<Deer>();
 
         foreach (var item in wolfList)
         {
-            item.BaseStatus.SetStatus(initialStatus);
-            item.BaseStatus.dna = WolfStatus.RandomGeneration(initialStatus.dna);
+            item.BaseStatus.SetStatus(curInitialStatus);
+            item.BaseStatus.dna = WolfStatus.RandomGeneration(curInitialStatus.dna);
             item.Init();
         }
 
@@ -97,7 +150,7 @@ public class GameManager : SingletonBehaviour<GameManager>
 
         foreach (var item in wolfList)
         {
-            item.BaseStatus = initialStatus.GetNewStatus(initialStatus,
+            item.BaseStatus = curInitialStatus.GetNewStatus(curInitialStatus,
                 wolfStatusList[topWolfId].dna, wolfStatusList[secondWolfId].dna, item.BaseStatus);
             item.Init();
 
@@ -110,7 +163,8 @@ public class GameManager : SingletonBehaviour<GameManager>
     private void WaitForSceneLoad(Scene arg0, LoadSceneMode arg1)
     {
         SceneManager.sceneLoaded -= WaitForSceneLoad;
-        StartCoroutine(CoWaitForSetup(GenCount <= 0 ? SetFistSimulation: SetNextSimulation));
+        //StartCoroutine(CoWaitForSetup(GenCount <= 0 ? SetFistSimulation: SetNextSimulation));
+        StartCoroutine(CoWaitForSetup(SetFistSimulation));
     }
 
     private IEnumerator CoWaitForSetup(UnityAction _func)
@@ -136,10 +190,10 @@ public class GameManager : SingletonBehaviour<GameManager>
             wolfStatusList[i].lifeTime = _lifeTime;
 
             --totalWolfCount;
-            if(totalWolfCount <= 0)
+            if(totalWolfCount <= 0 && IsGameOver == false)
             {
-                GetTopAndSecond(out topWolfId, out secondWolfId); // 다음 세대 부모 계산
-                RecordGenerationResult(topWolfId, secondWolfId); // 이번 세대 결과 저장
+                //GetTopAndSecond(out topWolfId, out secondWolfId); // 다음 세대 부모 계산
+                //RecordGenerationResult(topWolfId, secondWolfId); // 이번 세대 결과 저장
                 //ResetSimulation(); // 시뮬레이션 재시작
                 IsGameOver = true;
                 OnGameOver?.Invoke();
