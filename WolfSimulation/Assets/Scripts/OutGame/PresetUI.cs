@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Purchasing;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +7,7 @@ public class PresetUI : MonoBehaviour
 {
     [SerializeField] public NetworkConnecter connecter;
     [SerializeField] public NetworkManager.GameMap map;
+    [SerializeField] private GameObject LoadingPage;
 
     [Header("Pre")]
     [SerializeField] private Button GetMyBest;
@@ -67,6 +67,7 @@ public class PresetUI : MonoBehaviour
 
     public void UIInit(int maxStatusPoint)
     {
+        LoadingPage.SetActive(false);
         this.maxStatusPoint = maxStatusPoint;
         remainStatusPoint = maxStatusPoint;
         remainState.text = remainStatusPoint.ToString();
@@ -101,20 +102,29 @@ public class PresetUI : MonoBehaviour
         if (remainStatusPoint - 1 < 0)
             return;
 
-        remainStatusPoint -= 1;
-        remainState.text = remainStatusPoint.ToString();
+        float newVal = Mathf.Clamp01(slider.value + 0.1f);
+        if(newVal != slider.value)
+        {
+            slider.value = newVal;
+            remainStatusPoint -= 1;
+            remainState.text = remainStatusPoint.ToString();
+        }
 
-        slider.value = Mathf.Clamp01(slider.value + 0.1f);
     }
     public void SubState(Slider slider)
     {
         if (remainStatusPoint + 1 > maxStatusPoint)
             return;
 
-        remainStatusPoint += 1;
-        remainState.text = remainStatusPoint.ToString();
+        float newVal = Mathf.Clamp01(slider.value - 0.1f);
+        if (newVal != slider.value)
+        {
 
-        slider.value = Mathf.Clamp01(slider.value - 0.1f);
+            remainStatusPoint += 1;
+            remainState.text = remainStatusPoint.ToString();
+
+            slider.value = newVal;
+        }
     }
 
     public void OnGameStart()

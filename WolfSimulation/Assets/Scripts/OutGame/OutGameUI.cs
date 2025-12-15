@@ -101,6 +101,14 @@ public class OutGameUI : MonoBehaviour
         RegistPanel.SetActive(true);
     }
 
+    public void CloseSignUp()
+    {
+        registerPassword.text = string.Empty;
+        registerErrorMsg.text = string.Empty;
+        registerPassword.text = string.Empty;
+        RegistPanel.SetActive(false);
+    }
+
     public void OnCreateAccount()
     {
         if (registerUserName.text.Length <= 0 || registerPassword.text.Length <= 0) {
@@ -183,6 +191,8 @@ public class OutGameUI : MonoBehaviour
 
         presetUIs[(int)gameMap].UIInit(GameManager.Instance.StateCount);
     }
+
+
     #endregion
 
     #region LeaderBoard()

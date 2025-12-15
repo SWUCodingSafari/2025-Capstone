@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class WolfState : MonoBehaviour
+public class WolfState
 {
     public enum StateType
     {

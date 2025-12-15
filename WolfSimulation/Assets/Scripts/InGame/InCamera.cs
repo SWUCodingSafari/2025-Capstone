@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InCamera : MonoBehaviour
 {
     [SerializeField] private Vector3 camPosOffset = Vector3.up * 15f;
     [SerializeField] private float camMoveTime = 0.5f;
     [SerializeField] private Transform curWolf;
+    [SerializeField] private Text curWolfText;
     private int curWolfIndex;
 
     private Transform camTrans;
@@ -66,6 +68,7 @@ public class InCamera : MonoBehaviour
 
         curWolfIndex = index;
         curWolf = wolfList[curWolfIndex].transform;
+        curWolfText.text = $"Wolf {curWolfIndex + 1}";
 
         StopAllCoroutines();
         StartCoroutine(CoMoveToNewWolf(curWolf));

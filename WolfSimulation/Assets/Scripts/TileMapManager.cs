@@ -67,10 +67,12 @@ public class TileMapManager : MonoBehaviour
     private int heightCount = 0;
 
     private List<List<TileInfo>> tiles = new List<List<TileInfo>>();
+    [SerializeField] private InGameManager ingameManager;
 
     [Header("Deer")]
     [SerializeField] private float decayInterval = 0.2f;
     [SerializeField] private float decayPercentPerSecond = 0.2f;
+    
     private float fixedTimer = 0f;
 
     private void Awake()
@@ -101,6 +103,14 @@ public class TileMapManager : MonoBehaviour
                 tiles[i][j].WeatherSetting.windDirection = WindDirection.None;
                 tiles[i][j].WeatherSetting.windSpeed = 0f;
             }
+        }
+    }
+
+    private void Start()
+    {
+        if(ingameManager.curMap == NetworkManager.GameMap.rain)
+        {
+            decayPercentPerSecond *= 1.5f;
         }
     }
 

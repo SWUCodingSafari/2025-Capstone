@@ -25,7 +25,7 @@ public class InGameManager : MonoBehaviour
     [SerializeField] private GameObject bestScore;
 
     [SerializeField] private NetworkConnecter connecter;
-    [SerializeField] private NetworkManager.GameMap curMap;
+    [field: SerializeField] public NetworkManager.GameMap curMap { get; private set; }
 
     private int RetryCount = 5;
     private int curScore = 0;
@@ -83,6 +83,7 @@ public class InGameManager : MonoBehaviour
 
     private void OnSubmit(bool ok, string msg, bool code)
     {
+        loadingUI.SetActive(false);
         resultPanel.SetActive(true);
 
         errorText.gameObject.SetActive(ok == false);

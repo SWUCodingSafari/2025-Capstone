@@ -9,6 +9,15 @@ EditorBuildSettings:
     path: Assets/Scenes/Build/PreScene.unity
     guid: eef41fc045033a449b2701ae96ed8994
   - enabled: 1
+    path: Assets/Scenes/Build/GrasslandScene.unity
+    guid: 817fc5e778ea8a74bba8f0d067e07390
+  - enabled: 1
+    path: Assets/Scenes/Build/HeavyRainScene.unity
+    guid: 1129b95c696f7024b9a48d54c70f5fb5
+  - enabled: 1
+    path: Assets/Scenes/Build/SnowScene.unity
+    guid: 0668f627879212f418c063ff7eecda15
+  - enabled: 0
     path: Assets/Scenes/MainScene.unity
     guid: a79a65cef6479604ab20f89afd17bbca
   m_configObjects: {}

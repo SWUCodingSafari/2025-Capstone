@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Search;
-using UnityEditor.Searcher;
 using UnityEngine;
 
 public class NDeerSearch : AnimalStateBehaviour

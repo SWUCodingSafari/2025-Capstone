@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
-using UnityEngine.WSA;
 using DNA = AnimalStatus.DNAFactors;
 
 public class GameManager : SingletonBehaviour<GameManager>
@@ -12,8 +11,8 @@ public class GameManager : SingletonBehaviour<GameManager>
     public enum SceneNumberConst
     {
         Plain = 1,
-        Rain = 1,
-        Snow = 1
+        Rain = 2,
+        Snow = 3
     }
 
     public struct GAResults
@@ -95,8 +94,25 @@ public class GameManager : SingletonBehaviour<GameManager>
         curInitialStatus.hungerSencitivity += state.HungerSensitivity * adderSetting[(int)WolfState.StateType.HungerSensitivity].stateAdder;
         curInitialStatus.scentSencitivity += Mathf.RoundToInt(state.ScentSensitivity * adderSetting[(int)WolfState.StateType.ScentSensitivity].stateAdder);
 
+        if(map == NetworkManager.GameMap.rain)
+        {
+            curInitialStatus.viewDist *= 0.8f;
+            curInitialStatus.addHungerBySec *= 1.2f;
+            curInitialStatus.addHungerByheallingSec *= 1.2f;
+        }
+        else if(map == NetworkManager.GameMap.snow)
+        {
+            curInitialStatus.viewDist *= 0.95f;
+            
+            curInitialStatus.addHungerBySec *= 1.15f;
+            curInitialStatus.addHungerByheallingSec *= 1.15f;
 
-        int SceneNumber = 0;
+            curInitialStatus.moveSpeed *= 0.8f;
+            curInitialStatus.runSpeed *= 0.8f;
+            curInitialStatus.maxRunSpeed *= 0.8f;
+        }
+
+            int SceneNumber = 0;
         switch(map)
         {
             case NetworkManager.GameMap.plain: SceneNumber = (int)SceneNumberConst.Plain; break;
